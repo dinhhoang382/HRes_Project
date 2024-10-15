@@ -1,0 +1,14 @@
+    // console.log(previousOrders);
+  
+    // const updateQuantity = (id: string, quantity: number) => {
+    //   setPreviousOrders(prevOrders =>
+    //     prevOrders.map(order =>
+    //       order.id === id
+    //         ? {
+    //             ...order,
+    //             quantity: Math.max(order.quantity + quantity, 1), // Không cho phép số lượng dưới 1
+    //           }
+    //         : order,
+    //     ),
+    //   );
+    // };

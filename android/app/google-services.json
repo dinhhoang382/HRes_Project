@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "843888928027",
+    "project_id": "hres-project",
+    "storage_bucket": "hres-project.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:843888928027:android:e86016f7e3872c50f0dfbe",
+        "android_client_info": {
+          "package_name": "com.hresproject"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAW-sHu69u4QVqpF5apY91ZOCOZXtCG4yo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
