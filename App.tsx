@@ -19,7 +19,10 @@ import OrderScreen from './src/OrderScreen';
 import PaymentScreen from './src/PaymentScreen';
 import DrawerNavigation from './navigation/DrawerNavigation';
 import PreviousOrderScreen from './src/PreviousOrderScreen';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import UserProfileScreen from './src/userProfileScreen';
+import {GestureHandlerRootView} from 'react-native-gesture-handler';
+import ForgotPasswordScreen from './src/ForgotPasswordScreen';
+import ChangePasswordScreen from './src/ChangePasswordScreen';
 const Stack = createNativeStackNavigator();
 const App = () => {
   const isDarkMode = useColorScheme() === 'dark';
@@ -31,22 +34,34 @@ const App = () => {
     <GestureHandlerRootView style={{flex: 1}}>
       <NavigationContainer>
         {/*Thanh trang thai*/}
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
-      <Stack.Navigator screenOptions={{headerShown: false}}>
-        <Stack.Screen name="Login" component={Login} />
-        <Stack.Screen name="DrawerNavigation" component={DrawerNavigation} />
-        <Stack.Screen name="TableDetail" component={TableDetail} />
-        <Stack.Screen name="OrderScreen" component={OrderScreen} />
-        <Stack.Screen name="PaymentScreen" component={PaymentScreen} />
-        <Stack.Screen
-          name="PreviousOrderScreen"
-          component={PreviousOrderScreen}
+        <StatusBar
+          barStyle={isDarkMode ? 'light-content' : 'dark-content'}
+          backgroundColor={backgroundStyle.backgroundColor}
         />
-      </Stack.Navigator>
-    </NavigationContainer>
+        <Stack.Navigator screenOptions={{headerShown: false}}>
+          <Stack.Screen name="Login" component={Login} />
+          <Stack.Screen name="DrawerNavigation" component={DrawerNavigation} />
+          <Stack.Screen name="TableDetail" component={TableDetail} />
+          <Stack.Screen name="OrderScreen" component={OrderScreen} />
+          <Stack.Screen name="PaymentScreen" component={PaymentScreen} />
+          <Stack.Screen
+            name="PreviousOrderScreen"
+            component={PreviousOrderScreen}
+          />
+          <Stack.Screen
+            name="UserProfileScreen"
+            component={UserProfileScreen}
+          />
+          <Stack.Screen
+            name="ForgotPasswordScreen"
+            component={ForgotPasswordScreen}
+          />
+          <Stack.Screen
+            name="ChangePasswordScreen"
+            component={ChangePasswordScreen}
+          />
+        </Stack.Navigator>
+      </NavigationContainer>
     </GestureHandlerRootView>
   );
 };

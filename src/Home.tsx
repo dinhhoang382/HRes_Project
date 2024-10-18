@@ -5,11 +5,13 @@ import {
   TouchableOpacity,
   FlatList,
   ActivityIndicator,
+  TouchableWithoutFeedback
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import firestore from '@react-native-firebase/firestore';
 import MenuIcon from '../navigation/menuIcon';
 import Icon from 'react-native-vector-icons/Ionicons';
+import UserModal from '../utils/userModal';
 
 //Define an interface for table data
 interface Table {
@@ -27,6 +29,8 @@ const Home = ({route, navigation}: {route: any; navigation: any}) => {
   console.log('Home', userId);
   const [tableData, setTableData] = useState<Table[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [modalVisible, isModalVisible] = useState(true);
+  const [cardVisible, setCardVisible] = useState(false);
 
   //Hàm lấy dữ liệu từ firestore
   useEffect(() => {
@@ -87,14 +91,20 @@ const Home = ({route, navigation}: {route: any; navigation: any}) => {
 
   return (
     <View style={styles.container}>
-      <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+      <View style={styles.header}>
         <MenuIcon navigation={navigation} />
-        <Text style={[styles.header, {fontSize: 20, fontWeight: 'bold'}]}>
-          Danh sách bàn
-        </Text>
-        <Text style={[styles.header, {alignSelf: 'flex-end', color: 'red'}]}>
-          {UserData.name}
-        </Text>
+        <View style={styles.headerCenter}>
+          <Text style={styles.headerTitle}>Danh sách bàn</Text>
+        </View>
+        {/* Thông tin tài khoản */}
+        <TouchableWithoutFeedback onPress={() => setCardVisible(!cardVisible)}>
+          <View style={styles.headerRight}>
+            <Text style={styles.userName}>{UserData.name}</Text>
+            <View style={styles.adminButton}>
+              <Icon name="person" size={24} color="white" />
+            </View>
+          </View>
+        </TouchableWithoutFeedback>
       </View>
       <FlatList
         data={tableData}
@@ -103,6 +113,38 @@ const Home = ({route, navigation}: {route: any; navigation: any}) => {
         renderItem={renderTable} //-> render
         numColumns={2} // Hiển thị 2 cột
       />
+      {/* <UserModal
+        isVisible={modalVisible}
+        onClose={() => isModalVisible(false)}
+        userData={UserData}
+        navigation={navigation}
+      /> */}
+      {/* Card thông tin tài khoản */}
+      {cardVisible && (
+        <View style={styles.cardContainer}>
+          <TouchableOpacity
+            style={styles.cardButton}
+            onPress={() =>
+              navigation.navigate('UserProfileScreen', {
+                userId: userId,
+              })
+            }>
+            <Text style={[styles.tableText, {color: 'white'}]}>
+              Thông tin tài khoản
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.cardButton}
+            onPress={() => setCardVisible(false)}>
+            <Text style={[styles.tableText, {color: 'white'}]}>Đăng xuất</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.cardButton}
+            onPress={() => setCardVisible(false)}>
+            <Text style={[styles.tableText, {color: 'white'}]}>Thoát</Text>
+          </TouchableOpacity>
+        </View>
+      )}
     </View>
   );
 };
@@ -116,6 +158,15 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 10,
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+
+  headerRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   tableItem: {
     flex: 1,
@@ -132,11 +183,25 @@ const styles = StyleSheet.create({
     shadowRadius: 3,
     elevation: 5,
   },
+  userName: {
+    marginRight: 10,
+    fontSize: 16,
+    color: 'green',
+  },
   available: {
     backgroundColor: '#c8e6c9',
   },
   occupied: {
     backgroundColor: '#ffcdd2',
+  },
+  adminButton: {
+    width: 35,
+    height: 35,
+    borderRadius: 5,
+    backgroundColor: 'green',
+    // backgroundColor: '#007AFF',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   tableText: {
     fontSize: 16,
@@ -145,6 +210,34 @@ const styles = StyleSheet.create({
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
+    alignItems: 'center',
+  },
+  cardContainer: {
+    position: 'absolute',
+    width: 250,
+    alignItems: 'center',
+    top: 60,
+    right: 10,
+    backgroundColor: '#fff',
+    padding: 10,
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+    zIndex: 1, // Đảm bảo Card hiển thị trên các phần tử khác
+  },
+  cardButton: {
+    backgroundColor: '#2196F3',
+    borderRadius: 10,
+    width: '90%',
+    padding: 10,
+    marginTop: 10,
+    alignItems: 'center',
+  },
+  headerCenter: {
+    flex: 1,
     alignItems: 'center',
   },
 });

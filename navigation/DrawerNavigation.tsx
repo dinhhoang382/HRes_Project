@@ -5,6 +5,7 @@ import {
   DrawerNavigationProp,
 } from '@react-navigation/drawer';
 import Home from '../src/Home';
+import UserProfileScreen from '../src/userProfileScreen';
 import TableDetail from '../src/TableDetail';
 import {NavigationContainer} from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -13,7 +14,7 @@ const Drawer = createDrawerNavigator();
 
 const DrawerNavigation = ({route}: {route: any}) => {
   const {UserData, userId} = route.params || {};
-  console.log('UserData:Drawer ', UserData, userId);
+  // console.log('UserData:Drawer ', UserData, userId);
 
   return (
     <Drawer.Navigator initialRouteName="Home">
@@ -21,6 +22,12 @@ const DrawerNavigation = ({route}: {route: any}) => {
         name="Home"
         component={Home}
         options={{headerShown: false, title: 'Trang chủ'}}
+        initialParams={{UserData, userId}}
+      />
+      <Drawer.Screen
+        name="UserProfileScreen"
+        component={UserProfileScreen}
+        options={{headerShown: false, title: 'Tài khoản'}}
         initialParams={{UserData, userId}}
       />
     </Drawer.Navigator>

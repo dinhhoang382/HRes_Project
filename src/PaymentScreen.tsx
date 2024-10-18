@@ -1,6 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import React, {useState, useEffect} from 'react';
+import {
+  View,
+  Text,
+  FlatList,
+  StyleSheet,
+  TouchableOpacity,
+  Alert,
+  ActivityIndicator,
+} from 'react-native';
+import {useNavigation, useRoute} from '@react-navigation/native';
 import firestore from '@react-native-firebase/firestore';
 
 interface OrderItem {
@@ -18,8 +26,8 @@ interface PaymentScreenProps {
   };
 }
 
-const PaymentScreen: React.FC<PaymentScreenProps> = ({ route }) => {
-  const { invoiceId } = route.params;
+const PaymentScreen = ({route}: {route: any}) => {
+  const {invoiceId} = route.params;
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
   const [totalAmount, setTotalAmount] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -28,7 +36,10 @@ const PaymentScreen: React.FC<PaymentScreenProps> = ({ route }) => {
   useEffect(() => {
     const fetchInvoiceDetails = async () => {
       try {
-        const invoiceDoc = await firestore().collection('invoices').doc(invoiceId).get();
+        const invoiceDoc = await firestore()
+          .collection('invoices')
+          .doc(invoiceId)
+          .get();
         const invoiceData = invoiceDoc.data();
 
         if (invoiceData) {
@@ -41,9 +52,12 @@ const PaymentScreen: React.FC<PaymentScreenProps> = ({ route }) => {
             .get();
 
           const items: OrderItem[] = [];
-          const foodItemPromises = itemsSnapshot.docs.map(async (doc) => {
+          const foodItemPromises = itemsSnapshot.docs.map(async doc => {
             const itemData = doc.data();
-            const foodItemDoc = await firestore().collection('food_items').doc(itemData.food_item_id).get();
+            const foodItemDoc = await firestore()
+              .collection('food_items')
+              .doc(itemData.food_item_id)
+              .get();
             const foodItemData = foodItemDoc.data();
             return {
               food_item_id: itemData.food_item_id,
@@ -77,10 +91,14 @@ const PaymentScreen: React.FC<PaymentScreenProps> = ({ route }) => {
 
       // Update revenue stats
       const date = new Date();
-      const dateString = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
-      const revenueRef = firestore().collection('revenue_stats').doc(dateString);
+      const dateString = `${date.getFullYear()}-${
+        date.getMonth() + 1
+      }-${date.getDate()}`;
+      const revenueRef = firestore()
+        .collection('revenue_stats')
+        .doc(dateString);
 
-      await firestore().runTransaction(async (transaction) => {
+      await firestore().runTransaction(async transaction => {
         const revenueDoc = await transaction.get(revenueRef);
         if (revenueDoc.exists) {
           transaction.update(revenueRef, {
@@ -104,14 +122,21 @@ const PaymentScreen: React.FC<PaymentScreenProps> = ({ route }) => {
     }
   };
 
-  const renderOrderItem = ({ item }: { item: OrderItem }) => (
+  const renderOrderItem = ({item}: {item: OrderItem}) => (
     <View style={styles.orderItem}>
       <Text style={styles.itemName}>{item.food_name}</Text>
       <Text style={styles.itemDetails}>
-        Số lượng: {item.quantity} x {item.price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
+        Số lượng: {item.quantity} x{' '}
+        {item.price.toLocaleString('vi-VN', {
+          style: 'currency',
+          currency: 'VND',
+        })}
       </Text>
       <Text style={styles.itemTotal}>
-        {(item.quantity * item.price).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
+        {(item.quantity * item.price).toLocaleString('vi-VN', {
+          style: 'currency',
+          currency: 'VND',
+        })}
       </Text>
     </View>
   );
@@ -131,13 +156,18 @@ const PaymentScreen: React.FC<PaymentScreenProps> = ({ route }) => {
       <FlatList
         data={orderItems}
         renderItem={renderOrderItem}
-        keyExtractor={(item) => item.food_item_id}
-        ListHeaderComponent={<Text style={styles.sectionTitle}>Danh sách món ăn</Text>}
+        keyExtractor={item => item.food_item_id}
+        ListHeaderComponent={
+          <Text style={styles.sectionTitle}>Danh sách món ăn</Text>
+        }
       />
       <View style={styles.totalContainer}>
         <Text style={styles.totalText}>Tổng cộng:</Text>
         <Text style={styles.totalAmount}>
-          {totalAmount.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
+          {totalAmount.toLocaleString('vi-VN', {
+            style: 'currency',
+            currency: 'VND',
+          })}
         </Text>
       </View>
       <TouchableOpacity style={styles.payButton} onPress={handlePayment}>
