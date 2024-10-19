@@ -69,7 +69,7 @@ const UserProfileScreen = ({
 
   return (
     <View style={styles.container}>
-      <View style={{flexDirection: 'row', justifyContent: 'flex-start'}}>
+      <View style={styles.header}>
         <BackButton />
         <Text style={styles.title}>Thông tin người dùng</Text>
       </View>
@@ -77,31 +77,31 @@ const UserProfileScreen = ({
       {userData && userData.url ? (
         <Image source={{uri: userData.url}} style={styles.userImage} />
       ) : (
-        <Text>Chưa có hình ảnh</Text>
+        <Text style={styles.noImageText}>Chưa có hình ảnh</Text>
       )}
       {userData ? (
-        <View>
-          <Text>Tên: {userData.name}</Text>
-          <Text>Giới tính: {userData.gender}</Text>
-          <Text>Chức vụ: {userData.position}</Text>
-          <Text>Vai trò: {userData.role}</Text>
-          <Text>Email: {userData.email}</Text>
-          <Text>Điện thoại: {userData.phone}</Text>
-          <Text>Lương: {userData.salary}</Text>
-          <Text>Địa chỉ: {userData.address}</Text>
+        <View style={styles.userInfo}>
+          <Text style={styles.userInfoText}>Tên: {userData.name}</Text>
+          <Text style={styles.userInfoText}>Giới tính: {userData.gender}</Text>
+          <Text style={styles.userInfoText}>Chức vụ: {userData.position}</Text>
+          <Text style={styles.userInfoText}>Vai trò: {userData.role}</Text>
+          <Text style={styles.userInfoText}>Email: {userData.email}</Text>
+          <Text style={styles.userInfoText}>Điện thoại: {userData.phone}</Text>
+          <Text style={styles.userInfoText}>Lương: {userData.salary}</Text>
+          <Text style={styles.userInfoText}>Địa chỉ: {userData.address}</Text>
         </View>
       ) : (
-        <Text>Đang tải...</Text>
+        <Text style={styles.loadingText}>Đang tải...</Text>
       )}
 
       {/* Nút Đổi mật khẩu */}
       <View style={styles.buttonContainer}>
-        <Button title="Đổi mật khẩu" onPress={handleChangePassword} />
+        <Button title="Đổi mật khẩu" onPress={handleChangePassword} color="#007BFF" />
       </View>
 
       {/* Nút Đăng xuất */}
       <View style={styles.buttonContainer}>
-        <Button title="Đăng xuất" onPress={showLogoutConfirmation} />
+        <Button title="Đăng xuất" onPress={showLogoutConfirmation} color="#FF0000" />
       </View>
     </View>
   );
@@ -113,14 +113,19 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
+    backgroundColor: '#ffffff', // Changed to white for a cleaner look
   },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
     marginBottom: 20,
   },
-  buttonContainer: {
-    marginTop: 20,
+  title: {
+    fontSize: 26, // Increased font size
+    fontWeight: 'bold',
+    color: '#333', // Darker color for better contrast
+    marginLeft: 10,
   },
   userImage: {
     width: 150,
@@ -128,5 +133,30 @@ const styles = StyleSheet.create({
     borderRadius: 75,
     marginBottom: 20,
     alignSelf: 'center',
+    borderWidth: 2,
+    borderColor: '#ccc',
+  },
+  noImageText: {
+    textAlign: 'center',
+    color: '#888',
+    marginBottom: 20,
+  },
+  userInfo: {
+    marginBottom: 20,
+  },
+  userInfoText: {
+    fontSize: 16,
+    color: '#555',
+    marginBottom: 5,
+  },
+  loadingText: {
+    textAlign: 'center',
+    color: '#888',
+    marginBottom: 20,
+  },
+  buttonContainer: {
+    marginTop: 20,
+    borderRadius: 5,
+    overflow: 'hidden',
   },
 });

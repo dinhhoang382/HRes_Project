@@ -145,6 +145,7 @@ const PaymentScreen = ({route, navigation}: {route: any; navigation: any}) => {
       console.error('Error processing payment:', error);
       Alert.alert('Lỗi', 'Không thể xử lý thanh toán');
     }
+    
   };
 
   const renderOrderItem = ({item}: {item: OrderItem}) => (

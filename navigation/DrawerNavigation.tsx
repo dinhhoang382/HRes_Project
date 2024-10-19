@@ -9,6 +9,7 @@ import UserProfileScreen from '../src/userProfileScreen';
 import TableDetail from '../src/TableDetail';
 import {NavigationContainer} from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import PaymentHistoryScreen from '../src/PaymentHistoryScreen';
 
 const Drawer = createDrawerNavigator();
 
@@ -29,6 +30,11 @@ const DrawerNavigation = ({route}: {route: any}) => {
         component={UserProfileScreen}
         options={{headerShown: false, title: 'Tài khoản'}}
         initialParams={{UserData, userId}}
+      />
+      <Drawer.Screen
+        name="PaymentHistoryScreen"
+        component={PaymentHistoryScreen}
+        options={{headerShown: false, title: 'Quản lý Thanh toán'}}
       />
     </Drawer.Navigator>
   );
