@@ -202,7 +202,7 @@ const TableDetail = ({route, navigation}: {route: any; navigation: any}) => {
         <TouchableOpacity
           style={[styles.button, {backgroundColor: 'green'}]}
           onPress={() =>
-            navigation.navigate('PaymentScreen', {invoiceId: invoiceId})
+            navigation.navigate('PaymentScreen', {invoiceId: invoiceId, table_id: table.id})
           }>
           <Text style={styles.buttonText}>Thanh toán</Text>
         </TouchableOpacity>

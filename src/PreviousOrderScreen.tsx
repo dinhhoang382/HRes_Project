@@ -4,7 +4,14 @@ import {
   serverTimestamp,
 } from '@react-native-firebase/firestore';
 import React, {useEffect, useState} from 'react';
-import {View, Text, Image, StyleSheet, TouchableOpacity, Alert} from 'react-native';
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+  Alert,
+} from 'react-native';
 import {FlatList} from 'react-native-gesture-handler';
 import firestore from '@react-native-firebase/firestore';
 
@@ -172,12 +179,12 @@ const PreviousOrderScreen = ({
       });
 
       // Update table status
-    if (table_id) {
-      const tableRef = firestore().collection('tables').doc(table_id);
-      batch.update(tableRef, {
-        status: 'ordered',
-      });
-    }
+      if (table_id) {
+        const tableRef = firestore().collection('tables').doc(table_id);
+        batch.update(tableRef, {
+          status: 'ordered',
+        });
+      }
 
       // Thực hiện lưu các invoice_items
       await batch.commit();

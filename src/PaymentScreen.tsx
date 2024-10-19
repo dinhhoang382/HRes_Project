@@ -26,12 +26,11 @@ interface PaymentScreenProps {
   };
 }
 
-const PaymentScreen = ({route}: {route: any}) => {
-  const {invoiceId} = route.params;
+const PaymentScreen = ({route, navigation}: {route: any; navigation: any}) => {
+  const {invoiceId, table_id} = route.params;
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
   const [totalAmount, setTotalAmount] = useState(0);
   const [loading, setLoading] = useState(true);
-  const navigation = useNavigation();
 
   useEffect(() => {
     const fetchInvoiceDetails = async () => {
@@ -83,39 +82,65 @@ const PaymentScreen = ({route}: {route: any}) => {
 
   const handlePayment = async () => {
     try {
-      // Update invoice status to 'paid'
-      await firestore().collection('invoices').doc(invoiceId).update({
-        status: 'paid',
+      // Fetch invoice details
+      const invoiceRef = firestore().collection('invoices').doc(invoiceId);
+      const invoiceDoc = await invoiceRef.get();
+      const invoiceData = invoiceDoc.data();
+      const tableNumber = invoiceData?.table_number;
+
+      // Fetch order items
+      const itemsSnapshot = await invoiceRef.collection('invoice_items').get();
+      const items = itemsSnapshot.docs.map(doc => doc.data());
+
+      // Start a batch
+      const batch = firestore().batch();
+
+      // Save payment history
+      const paymentHistoryRef = firestore().collection('payment_history').doc();
+      batch.set(paymentHistoryRef, {
+        invoiceId,
+        tableNumber,
+        totalAmount,
         paid_at: firestore.FieldValue.serverTimestamp(),
+        user_id: invoiceData?.user_id || 'unknown',
+        items,
       });
 
-      // Update revenue stats
-      const date = new Date();
-      const dateString = `${date.getFullYear()}-${
-        date.getMonth() + 1
-      }-${date.getDate()}`;
-      const revenueRef = firestore()
-        .collection('revenue_stats')
-        .doc(dateString);
+      // Update table status
+      if (table_id) {
+        const tableRef = firestore().collection('tables').doc(table_id);
+        batch.update(tableRef, {
+          status: 'available', // Set table status to available after payment
+        });
+      }
 
-      await firestore().runTransaction(async transaction => {
-        const revenueDoc = await transaction.get(revenueRef);
-        if (revenueDoc.exists) {
-          transaction.update(revenueRef, {
-            total_revenue: firestore.FieldValue.increment(totalAmount),
-            total_orders: firestore.FieldValue.increment(1),
-          });
-        } else {
-          transaction.set(revenueRef, {
-            date: firestore.Timestamp.fromDate(date),
-            total_revenue: totalAmount,
-            total_orders: 1,
-          });
-        }
-      });
+      // Reset invoice document
+      batch.set(
+        invoiceRef,
+        {
+          date: firestore.FieldValue.serverTimestamp(),
+          total_amount: 0,
+          user_id: null,
+          status: 'pending',
+          paid_at: null,
+          table_number: tableNumber, // Keeping the same table number, change if needed
+        },
+        {merge: false},
+      ); // This overwrites the entire document
 
-      Alert.alert('Thành công', 'Thanh toán đã được xử lý thành công');
-      navigation.goBack();
+      // Delete all items in the invoice_items subcollection
+      const deleteOps = itemsSnapshot.docs.map(doc =>
+        batch.delete(invoiceRef.collection('invoice_items').doc(doc.id)),
+      );
+
+      // Commit the batch
+      await Promise.all([batch.commit(), ...deleteOps]);
+
+      Alert.alert(
+        'Thành công',
+        'Thanh toán đã được xử lý thành công và hóa đơn đã được đặt lại',
+      );
+      navigation.navigate('Home');
     } catch (error) {
       console.error('Error processing payment:', error);
       Alert.alert('Lỗi', 'Không thể xử lý thanh toán');
