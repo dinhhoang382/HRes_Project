@@ -23,6 +23,8 @@ import UserProfileScreen from './src/userProfileScreen';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import ForgotPasswordScreen from './src/ForgotPasswordScreen';
 import ChangePasswordScreen from './src/ChangePasswordScreen';
+import AddEmployee from './src/Employee/AddEmployee';
+import EditEmployee from './src/Employee/EditEmployee';
 const Stack = createNativeStackNavigator();
 const App = () => {
   const isDarkMode = useColorScheme() === 'dark';
@@ -60,6 +62,8 @@ const App = () => {
             name="ChangePasswordScreen"
             component={ChangePasswordScreen}
           />
+          <Stack.Screen name="AddEmployee" component={AddEmployee} />
+          <Stack.Screen name='EditEmployee' component={EditEmployee} />
         </Stack.Navigator>
       </NavigationContainer>
     </GestureHandlerRootView>
