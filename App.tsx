@@ -25,6 +25,8 @@ import ForgotPasswordScreen from './src/ForgotPasswordScreen';
 import ChangePasswordScreen from './src/ChangePasswordScreen';
 import AddEmployee from './src/Employee/AddEmployee';
 import EditEmployee from './src/Employee/EditEmployee';
+import AddFood from './src/FoodManager/AddFood';
+import EditFood from './src/FoodManager/EditFood';
 const Stack = createNativeStackNavigator();
 const App = () => {
   const isDarkMode = useColorScheme() === 'dark';
@@ -64,6 +66,8 @@ const App = () => {
           />
           <Stack.Screen name="AddEmployee" component={AddEmployee} />
           <Stack.Screen name='EditEmployee' component={EditEmployee} />
+          <Stack.Screen name="AddFood" component={AddFood} />
+          <Stack.Screen name="EditFood" component={EditFood} />
         </Stack.Navigator>
       </NavigationContainer>
     </GestureHandlerRootView>

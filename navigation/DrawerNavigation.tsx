@@ -11,6 +11,7 @@ import {NavigationContainer} from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import PaymentHistoryScreen from '../src/PaymentHistoryScreen';
 import ManageEmployeeScreen from '../src/ManageEmployeeScreen';
+import ManageFoodScreen from '../src/ManageFoodScreen';
 
 const Drawer = createDrawerNavigator();
 
@@ -41,6 +42,11 @@ const DrawerNavigation = ({route}: {route: any}) => {
         name="ManageEmployeeScreen"
         component={ManageEmployeeScreen}
         options={{headerShown: false, title: 'Quản lý nhân viên'}}
+      />
+      <Drawer.Screen
+        name="ManageFoodScreen"
+        component={ManageFoodScreen}
+        options={{headerShown: false, title: 'Quản lý thực đơn'}}
       />
     </Drawer.Navigator>
   );
