@@ -12,6 +12,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import PaymentHistoryScreen from '../src/PaymentHistoryScreen';
 import ManageEmployeeScreen from '../src/ManageEmployeeScreen';
 import ManageFoodScreen from '../src/ManageFoodScreen';
+import PaymentHistoryRevenue from '../src/PaymentHistoryRevenue';
 
 const Drawer = createDrawerNavigator();
 
@@ -47,6 +48,11 @@ const DrawerNavigation = ({route}: {route: any}) => {
         name="ManageFoodScreen"
         component={ManageFoodScreen}
         options={{headerShown: false, title: 'Quản lý thực đơn'}}
+      />
+      <Drawer.Screen
+        name="PaymentHistoryRevenue"
+        component={PaymentHistoryRevenue}
+        options={{headerShown: false, title: 'Quản lý doanh thu'}}
       />
     </Drawer.Navigator>
   );
