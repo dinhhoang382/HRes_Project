@@ -17,6 +17,7 @@ import {ScrollView} from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Colors from '../color/colors';
 import BackButton from '../navigation/backButton';
+import {useFocusEffect} from '@react-navigation/native';
 
 interface FoodItem {
   id: string;
@@ -86,6 +87,12 @@ const ManageFoodScreen = ({
       );
     }
   }, [activeTab, foodItems]);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchFoodItems();
+    }, []),
+  );
 
   const tabs = [
     {id: 'all', title: 'Tất cả'},
@@ -166,7 +173,13 @@ const ManageFoodScreen = ({
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.container}>
         <View style={styles.mainContainer}>
-          <View style={{flexDirection: 'row', justifyContent: 'flex-start', marginHorizontal: 20, marginTop: 5}}>
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'flex-start',
+              marginHorizontal: 20,
+              marginTop: 5,
+            }}>
             <BackButton />
             <Text style={styles.title}>Quản lý thực đơn</Text>
           </View>
@@ -192,11 +205,23 @@ const ManageFoodScreen = ({
                   value={searchText}
                   onChangeText={setSearchText}
                 />
-                <TouchableOpacity
-                  style={styles.addButton}
-                  onPress={() => navigation.navigate('AddFood')}>
-                  <Text style={styles.addButtonText}>Thêm món ăn</Text>
-                </TouchableOpacity>
+                <View
+                  style={{
+                    flex: 1,
+                    flexDirection: 'row',
+                    justifyContent: 'space-around',
+                  }}>
+                  <TouchableOpacity
+                    style={styles.addButton}
+                    onPress={() => navigation.navigate('CategoryManage')}>
+                    <Text style={styles.addButtonText}>Danh mục món</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.addButton}
+                    onPress={() => navigation.navigate('AddFood')}>
+                    <Text style={styles.addButtonText}>Thêm món ăn</Text>
+                  </TouchableOpacity>
+                </View>
               </>
             }
             data={filteredItems}
@@ -284,7 +309,7 @@ const styles = StyleSheet.create({
   },
   addButton: {
     backgroundColor: '#007AFF',
-    borderRadius: 0,
+    borderRadius: 10,
     padding: 10,
     width: 150,
     alignSelf: 'flex-end',

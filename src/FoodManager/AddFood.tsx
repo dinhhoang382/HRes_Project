@@ -1,21 +1,36 @@
-import { Alert, Image, PermissionsAndroid, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
-import React, { useState } from 'react'
+import {
+  Alert,
+  Image,
+  PermissionsAndroid,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+  FlatList,
+} from 'react-native';
+import React, {useEffect, useState} from 'react';
 import firestore from '@react-native-firebase/firestore';
 import storage from '@react-native-firebase/storage';
-import { launchImageLibrary } from 'react-native-image-picker';
-import { Asset } from 'react-native-image-picker';
-import { Picker } from '@react-native-picker/picker';
+import {launchImageLibrary} from 'react-native-image-picker';
+import {Asset} from 'react-native-image-picker';
+import {Picker} from '@react-native-picker/picker';
 
-const AddFood = ({route, navigation}:{route: any, navigation: any}) => {
+const AddFood = ({route, navigation}: {route: any; navigation: any}) => {
   const [foodData, setFoodData] = useState({
     name: '',
     description: '',
     price: '',
     category_id: '',
-    imageUrl: ''
+    image: '',
   });
   const [image, setImage] = useState<Asset | null>(null);
   const [loading, setLoading] = useState(false);
+  const [categories, setCategories] = useState<
+    {id: string; [key: string]: any}[]
+  >([]);
   const requestStoragePermission = async () => {
     try {
       const granted = await PermissionsAndroid.request(
@@ -49,8 +64,9 @@ const AddFood = ({route, navigation}:{route: any, navigation: any}) => {
         mediaType: 'photo',
         quality: 1,
         includeBase64: false,
-      }
-      launchImageLibrary(options, (response) => {
+        title: 'Select an Image',
+      };
+      launchImageLibrary(options, response => {
         if (response.didCancel) {
           console.log('User cancelled image picker');
         } else if (response.errorCode) {
@@ -67,7 +83,7 @@ const AddFood = ({route, navigation}:{route: any, navigation: any}) => {
   const uploadImage = async () => {
     if (!image || !image.uri) return null;
 
-    const { uri } = image;
+    const {uri} = image;
     const filename = uri.substring(uri.lastIndexOf('/') + 1);
     const uploadUri = Platform.OS === 'ios' ? uri.replace('file://', '') : uri;
 
@@ -97,7 +113,7 @@ const AddFood = ({route, navigation}:{route: any, navigation: any}) => {
       const data = {
         ...foodData,
         price: parseFloat(foodData.price),
-        imageUrl: imageUrl || '',
+        image: imageUrl || '',
         createdAt: firestore.FieldValue.serverTimestamp(),
       };
 
@@ -110,7 +126,7 @@ const AddFood = ({route, navigation}:{route: any, navigation: any}) => {
         description: '',
         price: '',
         category_id: '',
-        imageUrl: ''
+        image: '',
       });
       setImage(null);
 
@@ -125,8 +141,20 @@ const AddFood = ({route, navigation}:{route: any, navigation: any}) => {
   const handlePriceChange = (text: string) => {
     // Chỉ cho phép nhập số
     const numberOnly = text.replace(/[^0-9]/g, '');
-    setFoodData({ ...foodData, price: numberOnly });
+    setFoodData({...foodData, price: numberOnly});
   };
+  useEffect(() => {
+    const fetchCategories = async () => {
+      const snapshot = await firestore().collection('categories').get();
+      const categoriesData = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setCategories(categoriesData); // categories là state quản lý danh sách danh mục
+    };
+
+    fetchCategories();
+  }, []);
 
   return (
     <ScrollView style={styles.container}>
@@ -136,7 +164,7 @@ const AddFood = ({route, navigation}:{route: any, navigation: any}) => {
         <TextInput
           style={styles.input}
           value={foodData.name}
-          onChangeText={(text) => setFoodData({ ...foodData, name: text })}
+          onChangeText={text => setFoodData({...foodData, name: text})}
           placeholder="Nhập tên món ăn"
         />
       </View>
@@ -145,7 +173,7 @@ const AddFood = ({route, navigation}:{route: any, navigation: any}) => {
         <TextInput
           style={[styles.input, styles.textArea]}
           value={foodData.description}
-          onChangeText={(text) => setFoodData({ ...foodData, description: text })}
+          onChangeText={text => setFoodData({...foodData, description: text})}
           placeholder="Nhập mô tả món ăn"
           multiline
           numberOfLines={4}
@@ -167,35 +195,33 @@ const AddFood = ({route, navigation}:{route: any, navigation: any}) => {
         <View style={styles.pickerContainer}>
           <Picker
             selectedValue={foodData.category_id}
-            onValueChange={(itemValue) =>
-              setFoodData({ ...foodData, category_id: itemValue })
+            onValueChange={itemValue =>
+              setFoodData({...foodData, category_id: itemValue})
             }
-            style={styles.picker}
-          >
+            style={styles.picker}>
             <Picker.Item label="Chọn danh mục" value="" enabled={false} />
-            <Picker.Item label="Món Hàu" value="oyster" />
-            <Picker.Item label="Tôm" value="shrimp" />
-            <Picker.Item label="Sò" value="clam" />
-            <Picker.Item label="Cua" value="crab" />
-            <Picker.Item label="Cá" value="fish" />
-            <Picker.Item label="Đồ uống" value="drinks" />
-            <Picker.Item label="Khác" value="other" />
+            {categories.map(category => (
+              <Picker.Item
+                key={category.id}
+                label={category.name}
+                value={category.value}
+              />
+            ))}
           </Picker>
         </View>
       </View>
 
       <View style={styles.formGroup}>
         <Text style={styles.label}>Hình ảnh</Text>
-        <TouchableOpacity 
-          style={styles.imageButton} 
+        <TouchableOpacity
+          style={styles.imageButton}
           onPress={pickImage}
-          activeOpacity={0.7}
-        >
+          activeOpacity={0.7}>
           <Text style={styles.imageButtonText}>Chọn ảnh</Text>
         </TouchableOpacity>
         {image && (
-          <Image 
-            source={{ uri: image.uri }} 
+          <Image
+            source={{uri: image.uri}}
             style={styles.previewImage}
             resizeMode="cover"
           />
@@ -205,17 +231,16 @@ const AddFood = ({route, navigation}:{route: any, navigation: any}) => {
         style={[styles.submitButton, loading && styles.disabledButton]}
         onPress={handleSubmit}
         disabled={loading}
-        activeOpacity={0.7}
-      >
+        activeOpacity={0.7}>
         <Text style={styles.submitButtonText}>
           {loading ? 'Đang xử lý...' : 'Thêm món ăn'}
         </Text>
       </TouchableOpacity>
     </ScrollView>
-  )
-}
+  );
+};
 
-export default AddFood
+export default AddFood;
 
 const styles = StyleSheet.create({
   container: {
@@ -294,4 +319,4 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
-})
+});
