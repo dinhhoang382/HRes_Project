@@ -13,6 +13,7 @@ import PaymentHistoryScreen from '../src/PaymentHistoryScreen';
 import ManageEmployeeScreen from '../src/ManageEmployeeScreen';
 import ManageFoodScreen from '../src/ManageFoodScreen';
 import PaymentHistoryRevenue from '../src/PaymentHistoryRevenue';
+import Setting from '../src/Setting';
 
 const Drawer = createDrawerNavigator();
 
@@ -53,6 +54,11 @@ const DrawerNavigation = ({route}: {route: any}) => {
         name="PaymentHistoryRevenue"
         component={PaymentHistoryRevenue}
         options={{headerShown: false, title: 'Quản lý doanh thu'}}
+      />
+      <Drawer.Screen
+        name="Setting"
+        component={Setting}
+        options={{headerShown: false, title: 'Cài đặt'}}
       />
     </Drawer.Navigator>
   );
