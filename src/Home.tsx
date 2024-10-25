@@ -11,7 +11,7 @@ import React, {useEffect, useState} from 'react';
 import firestore from '@react-native-firebase/firestore';
 import MenuIcon from '../navigation/menuIcon';
 import Icon from 'react-native-vector-icons/Ionicons';
-import UserModal from '../utils/userModal';
+import {Avatar} from 'react-native-paper';
 
 //Define an interface for table data
 interface Table {
@@ -22,14 +22,11 @@ interface Table {
   status: 'available' | 'ordered';
 }
 
-//-> Trang chủ
 const Home = ({route, navigation}: {route: any; navigation: any}) => {
-  //-> Lấy thông tin người dùng từ route
   const {UserData, userId} = route.params || {};
   console.log('Home', userId);
   const [tableData, setTableData] = useState<Table[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [cardVisible, setCardVisible] = useState(false);
   const [isGridView, setIsGridView] = useState(true);
 
   //Hàm lấy dữ liệu từ firestore
@@ -74,7 +71,6 @@ const Home = ({route, navigation}: {route: any; navigation: any}) => {
         <Text style={styles.tableText}>Bàn số {item.table_number}</Text>
         <Text style={styles.tableText}>Sức chứa: {item.seats} người</Text>
         <Text style={styles.tableText}>
-          {/* Trạng thái:{' '} */}
           {item.status === 'available' ? 'Bàn Trống' : 'Đang sử dụng'}
         </Text>
       </TouchableOpacity>
@@ -99,17 +95,21 @@ const Home = ({route, navigation}: {route: any; navigation: any}) => {
         <View style={styles.headerCenter}>
           <Text style={styles.headerTitle}>Danh sách bàn</Text>
         </View>
-        {/* Thông tin tài khoản */}
-        <TouchableWithoutFeedback onPress={() => setCardVisible(!cardVisible)}>
-          <View style={styles.headerRight}>
-            <Text style={styles.userName}>{UserData.name}</Text>
-            <View style={styles.adminButton}>
-              <Icon name="person" size={24} color="white" />
-            </View>
-          </View>
-        </TouchableWithoutFeedback>
+        <View style={styles.headerRight}>
+          <Text style={styles.userName}>{UserData.name}</Text>
+          <Avatar.Image
+            source={
+              UserData?.url
+                ? {uri: UserData.url}
+                : require('../image/logo/icon_login.png')
+            }
+            size={35}
+          />
+        </View>
       </View>
-      <TouchableOpacity style={{alignSelf: 'flex-end', marginEnd: 10}} onPress={toggleView}>
+      <TouchableOpacity
+        style={{alignSelf: 'flex-end', marginEnd: 10}}
+        onPress={toggleView}>
         <Icon
           name={isGridView ? 'grid-outline' : 'list-outline'}
           size={30}
@@ -124,31 +124,6 @@ const Home = ({route, navigation}: {route: any; navigation: any}) => {
         numColumns={isGridView ? 2 : 1} // Hiển thị 2 cột
         key={isGridView ? 'grid' : 'list'}
       />
-      {cardVisible && (
-        <View style={styles.cardContainer}>
-          <TouchableOpacity
-            style={styles.cardButton}
-            onPress={() =>
-              navigation.navigate('UserProfileScreen', {
-                userId: userId,
-              })
-            }>
-            <Text style={[styles.tableText, {color: 'white'}]}>
-              Thông tin tài khoản
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.cardButton}
-            onPress={() => setCardVisible(false)}>
-            <Text style={[styles.tableText, {color: 'white'}]}>Đăng xuất</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.cardButton}
-            onPress={() => setCardVisible(false)}>
-            <Text style={[styles.tableText, {color: 'white'}]}>Thoát</Text>
-          </TouchableOpacity>
-        </View>
-      )}
     </View>
   );
 };
@@ -201,7 +176,7 @@ const styles = StyleSheet.create({
   adminButton: {
     width: 35,
     height: 35,
-    borderRadius: 5,
+    borderRadius: 10,
     backgroundColor: 'green',
     // backgroundColor: '#007AFF',
     justifyContent: 'center',

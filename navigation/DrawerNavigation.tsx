@@ -6,14 +6,12 @@ import {
 } from '@react-navigation/drawer';
 import Home from '../src/Home';
 import UserProfileScreen from '../src/userProfileScreen';
-import TableDetail from '../src/TableDetail';
-import {NavigationContainer} from '@react-navigation/native';
-import Icon from 'react-native-vector-icons/Ionicons';
 import PaymentHistoryScreen from '../src/PaymentHistoryScreen';
 import ManageEmployeeScreen from '../src/ManageEmployeeScreen';
 import ManageFoodScreen from '../src/ManageFoodScreen';
 import PaymentHistoryRevenue from '../src/PaymentHistoryRevenue';
 import Setting from '../src/Setting';
+import {DrawerContent} from '../reanimate/DrawerContent';
 
 const Drawer = createDrawerNavigator();
 
@@ -22,7 +20,9 @@ const DrawerNavigation = ({route}: {route: any}) => {
   // console.log('UserData:Drawer ', UserData, userId);
 
   return (
-    <Drawer.Navigator initialRouteName="Home">
+    <Drawer.Navigator
+      initialRouteName="Home"
+      drawerContent={props => <DrawerContent {...props} UserData={UserData} />}>
       <Drawer.Screen
         name="Home"
         component={Home}
