@@ -5,7 +5,7 @@ import {
   TouchableOpacity,
   FlatList,
   ActivityIndicator,
-  TouchableWithoutFeedback
+  TouchableWithoutFeedback,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import firestore from '@react-native-firebase/firestore';
@@ -29,8 +29,8 @@ const Home = ({route, navigation}: {route: any; navigation: any}) => {
   console.log('Home', userId);
   const [tableData, setTableData] = useState<Table[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [modalVisible, isModalVisible] = useState(true);
   const [cardVisible, setCardVisible] = useState(false);
+  const [isGridView, setIsGridView] = useState(true);
 
   //Hàm lấy dữ liệu từ firestore
   useEffect(() => {
@@ -88,6 +88,9 @@ const Home = ({route, navigation}: {route: any; navigation: any}) => {
       </View>
     );
   }
+  const toggleView = () => {
+    setIsGridView(!isGridView);
+  };
 
   return (
     <View style={styles.container}>
@@ -106,20 +109,21 @@ const Home = ({route, navigation}: {route: any; navigation: any}) => {
           </View>
         </TouchableWithoutFeedback>
       </View>
+      <TouchableOpacity style={{alignSelf: 'flex-end', marginEnd: 10}} onPress={toggleView}>
+        <Icon
+          name={isGridView ? 'grid-outline' : 'list-outline'}
+          size={30}
+          color="black"
+        />
+      </TouchableOpacity>
       <FlatList
         data={tableData}
         //-> keyExtractor là một hàm được sử dụng để trích xuất một khóa duy nhất cho mỗi phần tử trong mảng dữ liệu.
         keyExtractor={item => item.id}
         renderItem={renderTable} //-> render
-        numColumns={2} // Hiển thị 2 cột
+        numColumns={isGridView ? 2 : 1} // Hiển thị 2 cột
+        key={isGridView ? 'grid' : 'list'}
       />
-      {/* <UserModal
-        isVisible={modalVisible}
-        onClose={() => isModalVisible(false)}
-        userData={UserData}
-        navigation={navigation}
-      /> */}
-      {/* Card thông tin tài khoản */}
       {cardVisible && (
         <View style={styles.cardContainer}>
           <TouchableOpacity
@@ -239,6 +243,11 @@ const styles = StyleSheet.create({
   headerCenter: {
     flex: 1,
     alignItems: 'center',
+  },
+  toggleButtonText: {
+    fontSize: 16,
+    color: 'blue',
+    marginLeft: 10,
   },
 });
 export default Home;
