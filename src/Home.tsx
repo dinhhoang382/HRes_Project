@@ -24,10 +24,13 @@ interface Table {
 
 const Home = ({route, navigation}: {route: any; navigation: any}) => {
   const {UserData, userId} = route.params || {};
-  console.log('Home', userId);
+  // console.log('Home', userId);
   const [tableData, setTableData] = useState<Table[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isGridView, setIsGridView] = useState(true);
+  const [filterStatus, setFilterStatus] = useState<
+    'all' | 'available' | 'ordered'
+  >('all');
 
   //Hàm lấy dữ liệu từ firestore
   useEffect(() => {
@@ -68,7 +71,10 @@ const Home = ({route, navigation}: {route: any; navigation: any}) => {
           item.status === 'ordered' ? styles.occupied : styles.available,
         ]}
         onPress={() => handleBookTable(item)}>
-        <Text style={styles.tableText}>Bàn số {item.table_number}</Text>
+        <Text style={styles.tableText}>
+          Số Bàn:{' '}
+          <Text style={{fontSize: 26, color: 'blue'}}>{item.table_number}</Text>
+        </Text>
         <Text style={styles.tableText}>Sức chứa: {item.seats} người</Text>
         <Text style={styles.tableText}>
           {item.status === 'available' ? 'Bàn Trống' : 'Đang sử dụng'}
@@ -84,9 +90,22 @@ const Home = ({route, navigation}: {route: any; navigation: any}) => {
       </View>
     );
   }
+  // Hiển thị danh sách lưới hoặc ô
   const toggleView = () => {
     setIsGridView(!isGridView);
   };
+  //Lọc danh sách bàn trống hoặc đang sử dụng
+  const toggleFilter = () => {
+    setFilterStatus(prevStatus => {
+      if (prevStatus === 'all') return 'available';
+      if (prevStatus === 'available') return 'ordered';
+      return 'all';
+    });
+  };
+  const filteredTableData = tableData.filter(table => {
+    if (filterStatus === 'all') return true;
+    return table.status === filterStatus;
+  });
 
   return (
     <View style={styles.container}>
@@ -107,17 +126,26 @@ const Home = ({route, navigation}: {route: any; navigation: any}) => {
           />
         </View>
       </View>
+      <View style={{flexDirection: 'row', justifyContent: 'space-between', marginHorizontal: 10}}>
       <TouchableOpacity
-        style={{alignSelf: 'flex-end', marginEnd: 10}}
-        onPress={toggleView}>
-        <Icon
-          name={isGridView ? 'grid-outline' : 'list-outline'}
-          size={30}
-          color="black"
-        />
+        style={styles.filterButton}
+        onPress={toggleFilter}>
+        <Text style={styles.filterButtonText}>
+          Lọc bàn: {filterStatus === 'all' ? 'Tất cả' : filterStatus === 'available' ? 'Trống' : 'Sử Dụng'}
+        </Text>
       </TouchableOpacity>
+        <TouchableOpacity
+          style={{alignSelf: 'flex-end', marginEnd: 10}}
+          onPress={toggleView}>
+          <Icon
+            name={isGridView ? 'grid-outline' : 'list-outline'}
+            size={30}
+            color="black"
+          />
+        </TouchableOpacity>
+      </View>
       <FlatList
-        data={tableData}
+        data={filteredTableData}
         //-> keyExtractor là một hàm được sử dụng để trích xuất một khóa duy nhất cho mỗi phần tử trong mảng dữ liệu.
         keyExtractor={item => item.id}
         renderItem={renderTable} //-> render
@@ -160,7 +188,9 @@ const styles = StyleSheet.create({
     shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.3,
     shadowRadius: 3,
-    elevation: 5,
+    elevation: 0, // Hiệu ứng shadow đổ bóng
+    borderWidth: 1,
+    borderColor: '#ccc',
   },
   userName: {
     marginRight: 10,
@@ -185,6 +215,7 @@ const styles = StyleSheet.create({
   tableText: {
     fontSize: 16,
     fontWeight: 'bold',
+    color: '#333',
   },
   loadingContainer: {
     flex: 1,
@@ -219,10 +250,13 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
   },
-  toggleButtonText: {
-    fontSize: 16,
-    color: 'blue',
-    marginLeft: 10,
+  filterButton: {
+    alignSelf: 'flex-end',
+    marginEnd: 10,
+  },
+  filterButtonText: {
+    color: 'black',
+    fontSize: 20,
   },
 });
 export default Home;
