@@ -170,7 +170,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
   },
-
   headerRight: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -201,16 +200,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#c8e6c9',
   },
   occupied: {
+    // backgroundColor: '#ffcdd2'
     backgroundColor: '#ffcdd2',
-  },
-  adminButton: {
-    width: 35,
-    height: 35,
-    borderRadius: 10,
-    backgroundColor: 'green',
-    // backgroundColor: '#007AFF',
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   tableText: {
     fontSize: 16,
@@ -222,30 +213,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  cardContainer: {
-    position: 'absolute',
-    width: 250,
-    alignItems: 'center',
-    top: 60,
-    right: 10,
-    backgroundColor: '#fff',
-    padding: 10,
-    borderRadius: 10,
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-    zIndex: 1, // Đảm bảo Card hiển thị trên các phần tử khác
-  },
-  cardButton: {
-    backgroundColor: '#2196F3',
-    borderRadius: 10,
-    width: '90%',
-    padding: 10,
-    marginTop: 10,
-    alignItems: 'center',
-  },
   headerCenter: {
     flex: 1,
     alignItems: 'center',
@@ -255,7 +222,7 @@ const styles = StyleSheet.create({
     marginEnd: 10,
   },
   filterButtonText: {
-    color: 'black',
+    color: 'gray',
     fontSize: 20,
   },
 });
