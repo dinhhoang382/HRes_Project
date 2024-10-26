@@ -3,7 +3,6 @@ import {
   Alert,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
@@ -11,7 +10,9 @@ import React, {useState} from 'react';
 import {Formik} from 'formik';
 import * as Yup from 'yup';
 import auth from '@react-native-firebase/auth';
-import {Button} from 'react-native';
+import {Button, TextInput} from 'react-native-paper';
+import BackButton from '../navigation/backButton';
+import Colors from '../color/colors';
 
 const ForgotPasswordScreen = ({navigation}: {navigation: any}) => {
   const [loading, setLoading] = useState(false);
@@ -47,50 +48,87 @@ const ForgotPasswordScreen = ({navigation}: {navigation: any}) => {
     }
   };
   return (
-    <Formik
-      initialValues={{email: ''}}
-      validationSchema={forgotPasswordSchema}
-      onSubmit={values => forgotPassword(values.email)}>
-      {({handleChange, handleBlur, handleSubmit, values, errors, touched}) => (
-        <View style={{padding: 20}}>
-          <Text>Nhập email để khôi phục mật khẩu:</Text>
-          {error ? (
-            <Text style={{color: 'red', marginBottom: 10}}>{error}</Text>
-          ) : null}
+    <View style={styles.container}>
+      <View style={{flexDirection: 'row', margin: 10}}>
+        <BackButton />
+        <Text style={styles.title}>Quên mật khẩu</Text>
+      </View>
+      <Formik
+        initialValues={{email: ''}}
+        validationSchema={forgotPasswordSchema}
+        onSubmit={values => forgotPassword(values.email)}>
+        {({
+          handleChange,
+          handleBlur,
+          handleSubmit,
+          values,
+          errors,
+          touched,
+        }) => (
+          <View style={{padding: 15}}>
+            <Text style={{fontSize: 18, marginBottom: 10, color: 'red'}}>
+              Nhập email để khôi phục mật khẩu* :
+            </Text>
+            {error ? (
+              <Text style={{color: 'red', marginBottom: 10}}>{error}</Text>
+            ) : null}
 
-          <TextInput
-            placeholder="Email"
-            onChangeText={handleChange('email')}
-            onBlur={handleBlur('email')}
-            value={values.email}
-            keyboardType="email-address"
-            style={{borderBottomWidth: 1, marginBottom: 10}}
-          />
-
-          {touched.email && errors.email ? (
-            <Text style={{color: 'red', marginBottom: 10}}>{errors.email}</Text>
-          ) : null}
-
-          {error ? (
-            <Text style={{color: 'red', marginBottom: 10}}>{error}</Text>
-          ) : null}
-
-          {loading ? (
-            <ActivityIndicator size="large" color="#0000ff" />
-          ) : (
-            <Button
-              title="Gửi"
-              onPress={() => {
-                handleSubmit();
-              }}
+            <TextInput
+              placeholder="Email"
+              inputMode="email"
+              mode="outlined"
+              onChangeText={handleChange('email')}
+              onBlur={handleBlur('email')}
+              value={values.email}
+              keyboardType="email-address"
+              style={{marginBottom: 10, width: '100%',}}
             />
-          )}
-        </View>
-      )}
-    </Formik>
+
+            {touched.email && errors.email ? (
+              <Text style={{color: 'red', marginBottom: 10}}>
+                {errors.email}
+              </Text>
+            ) : null}
+
+            {error ? (
+              <Text style={{color: 'red', marginBottom: 10}}>{error}</Text>
+            ) : null}
+
+            {loading ? (
+              <ActivityIndicator size="large" color="#0000ff" />
+            ) : (
+              <Button
+                mode="contained"
+                style={{
+                  marginTop: 5,
+                  marginBottom: 10,
+                  width: '60%',
+                  alignSelf: 'center',
+                  backgroundColor: Colors.AQUA_GREEN
+                }}
+                onPress={() => {
+                  handleSubmit();
+                }}>
+                Gửi
+              </Button>
+            )}
+          </View>
+        )}
+      </Formik>
+    </View>
   );
 };
 
 export default ForgotPasswordScreen;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+});

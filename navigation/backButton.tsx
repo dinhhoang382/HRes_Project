@@ -15,7 +15,7 @@ const BackButton = () => {
 
 const styles = StyleSheet.create({
   backButton: {
-    marginLeft: -10,
+    marginLeft: 5,
     marginRight: 10,
   },
 });
