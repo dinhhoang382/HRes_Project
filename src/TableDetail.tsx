@@ -156,9 +156,7 @@ const TableDetail = ({route, navigation}: {route: any; navigation: any}) => {
       <Text style={styles.detail}>
         Trạng thái: {table.status === 'available' ? 'Có sẵn' : 'Đã đặt'}
       </Text>
-      {username && (
-        <Text style={styles.detail}>Người đặt: {username}</Text> // Hiển thị tên người đặt món
-      )}
+      {username && <Text style={styles.detail}>Người đặt: {username}</Text>}
       {invoiceDate && (
         <Text style={styles.detail}>Ngày lập hóa đơn: {invoiceDate}</Text>
       )}
@@ -201,9 +199,21 @@ const TableDetail = ({route, navigation}: {route: any; navigation: any}) => {
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.button, {backgroundColor: 'green'}]}
-          onPress={() =>
-            navigation.navigate('PaymentScreen', {invoiceId: invoiceId, table_id: table.id})
-          }>
+          onPress={() => {
+            if (orderItems.length === 0) {
+              Alert.alert(
+                'Thông báo',
+                'Chưa có món ăn nào được đặt cho bàn này.',
+              );
+            } else {
+              navigation.navigate('PaymentScreen', {
+                invoiceId: invoiceId,
+                table_id: table.id,
+              });
+            }
+          }}
+          // disabled={orderItems.length === 0}
+          >
           <Text style={styles.buttonText}>Thanh toán</Text>
         </TouchableOpacity>
       </View>
