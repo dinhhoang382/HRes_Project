@@ -1,9 +1,11 @@
-import {Alert, Button, StyleSheet, Text, View} from 'react-native';
+import {Alert, StyleSheet, Text, View} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import firestore from '@react-native-firebase/firestore';
 import {FlatList} from 'react-native-gesture-handler';
 import BackButton from '../navigation/backButton';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import {Button} from 'react-native-paper';
+import Colors from '../color/colors';
 
 interface Employee {
   id: string;
@@ -82,9 +84,11 @@ const ManageEmployeeScreen = ({
         </Text>
       </View>
       <Button
-        title="Add Employee"
-        onPress={() => navigation.navigate('AddEmployee')}
-      />
+        mode="contained"
+        style={styles.addButton}
+        onPress={() => navigation.navigate('AddEmployee')}>
+        <Text>Thêm nhân viên</Text>
+      </Button>
       <FlatList
         data={employees}
         keyExtractor={item => item.id}
@@ -150,4 +154,13 @@ const styles = StyleSheet.create({
   icon: {
     marginLeft: 10,
   },
+  addButton: {
+    marginBottom: 10,
+    width: '40%',
+    height: 50,
+    alignSelf: 'flex-end',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: Colors.AQUA_GREEN
+  }
 });
