@@ -77,41 +77,41 @@ const Login = ({navigation}: {navigation: any}) => {
               touched,
             }) => (
               <View style={{width: '100%', alignItems: 'center'}}>
-                  <View style={styles.container1}>
-                    <TextInput
-                      style={styles.input}
-                      placeholder="Email"
-                      value={values.email}
-                      onChangeText={handleChange('email')}
-                      onBlur={handleBlur('email')}
-                      keyboardType="email-address"
-                      autoCapitalize="none"
-                    />
+                <View style={styles.container1}>
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Email"
+                    value={values.email}
+                    onChangeText={handleChange('email')}
+                    onBlur={handleBlur('email')}
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                  />
                 </View>
                 {touched.email && errors.email ? (
                   <Text style={styles.errorText}>{errors.email}</Text>
                 ) : null}
-                  <View style={styles.container1}>
-                    <TextInput
-                      style={styles.input}
-                      placeholder="Mật khẩu"
-                      secureTextEntry={showPassword}
-                      value={values.password}
-                      onChangeText={handleChange('password')}
-                      onBlur={handleBlur('password')}
+                <View style={styles.container1}>
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Mật khẩu"
+                    secureTextEntry={showPassword}
+                    value={values.password}
+                    onChangeText={handleChange('password')}
+                    onBlur={handleBlur('password')}
+                  />
+                  <TouchableOpacity
+                    onPress={() => setShowPassword(!showPassword)}>
+                    <Icon
+                      name={showPassword ? 'eye-slash' : 'eye'}
+                      size={20}
+                      color="gray"
                     />
-                    <TouchableOpacity
-                      onPress={() => setShowPassword(!showPassword)}>
-                      <Icon
-                        name={showPassword ? 'eye-slash' : 'eye'}
-                        size={20}
-                        color="gray"
-                      />
-                    </TouchableOpacity>
-                  </View>
-                  {touched.password && errors.password ? (
-                    <Text style={styles.errorText}>{errors.password}</Text>
-                  ) : null}
+                  </TouchableOpacity>
+                </View>
+                {touched.password && errors.password ? (
+                  <Text style={styles.errorText}>{errors.password}</Text>
+                ) : null}
 
                 <TouchableOpacity
                   onPress={handleSubmit as any}
