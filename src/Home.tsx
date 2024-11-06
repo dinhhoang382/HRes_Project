@@ -6,12 +6,15 @@ import {
   FlatList,
   ActivityIndicator,
   TouchableWithoutFeedback,
+  BackHandler,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import firestore from '@react-native-firebase/firestore';
 import MenuIcon from '../navigation/menuIcon';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {Avatar} from 'react-native-paper';
+import {Alert} from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 
 //Define an interface for table data
 interface Table {
@@ -31,7 +34,34 @@ const Home = ({route, navigation}: {route: any; navigation: any}) => {
   const [filterStatus, setFilterStatus] = useState<
     'all' | 'available' | 'ordered'
   >('all');
+  // Handle back button press
+  useFocusEffect(
+    React.useCallback(() => {
+      const onBackPress = () => {
+        Alert.alert(
+          'Xác nhận thoát',
+          'Bạn có chắc chắn muốn thoát ứng dụng?',
+          [
+            {
+              text: 'Hủy',
+              onPress: () => null,
+              style: 'cancel',
+            },
+            {
+              text: 'Thoát',
+              onPress: () => BackHandler.exitApp(),
+            },
+          ],
+          { cancelable: false }
+        );
+        return true; // Prevents default back action
+      };
 
+      BackHandler.addEventListener('hardwareBackPress', onBackPress);
+
+      return () => BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+    }, [])
+  );
   //Hàm lấy dữ liệu từ firestore
   useEffect(() => {
     const unsubscribe = firestore()
@@ -106,7 +136,6 @@ const Home = ({route, navigation}: {route: any; navigation: any}) => {
     if (filterStatus === 'all') return true;
     return table.status === filterStatus;
   });
-
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -126,14 +155,22 @@ const Home = ({route, navigation}: {route: any; navigation: any}) => {
           />
         </View>
       </View>
-      <View style={{flexDirection: 'row', justifyContent: 'space-between', marginHorizontal: 10}}>
-      <TouchableOpacity
-        style={styles.filterButton}
-        onPress={toggleFilter}>
-        <Text style={styles.filterButtonText}>
-          Lọc bàn: {filterStatus === 'all' ? 'Tất cả' : filterStatus === 'available' ? 'Trống' : 'Sử Dụng'}
-        </Text>
-      </TouchableOpacity>
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          marginHorizontal: 10,
+        }}>
+        <TouchableOpacity style={styles.filterButton} onPress={toggleFilter}>
+          <Text style={styles.filterButtonText}>
+            Lọc bàn:{' '}
+            {filterStatus === 'all'
+              ? 'Tất cả'
+              : filterStatus === 'available'
+              ? 'Trống'
+              : 'Sử Dụng'}
+          </Text>
+        </TouchableOpacity>
         <TouchableOpacity
           style={{alignSelf: 'flex-end', marginEnd: 10}}
           onPress={toggleView}>

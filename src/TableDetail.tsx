@@ -22,19 +22,6 @@ interface OrderItem {
   food_name: string;
   image: string;
 }
-interface TableDetailProps {
-  route: {
-    params: {
-      table?: {
-        table_number: string;
-        seats: number;
-        status: 'available' | 'occupied';
-      };
-    };
-  };
-  navigation: any;
-}
-
 const TableDetail = ({route, navigation}: {route: any; navigation: any}) => {
   const {table, userId} = route.params; // Lấy thông tin bàn từ params
   console.log('Table', table);
@@ -43,7 +30,6 @@ const TableDetail = ({route, navigation}: {route: any; navigation: any}) => {
   const [invoiceId, setInvoiceId] = useState<string | null>(null);
   const [username, setUser] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  // console.log('TableDetail: ', table);
   useEffect(() => {
     const fetchOrderItems = async () => {
       try {
@@ -193,11 +179,6 @@ const TableDetail = ({route, navigation}: {route: any; navigation: any}) => {
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={[styles.button, {backgroundColor: 'red'}]}
-          onPress={() => {}}>
-          <Text style={styles.buttonText}>Thêm món</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
           style={[styles.button, {backgroundColor: 'green'}]}
           onPress={() => {
             if (orderItems.length === 0) {
@@ -224,7 +205,7 @@ const TableDetail = ({route, navigation}: {route: any; navigation: any}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    padding: 10,
   },
   title: {
     fontSize: 22,
@@ -274,7 +255,7 @@ const styles = StyleSheet.create({
   button: {
     flex: 1,
     padding: 15,
-    borderRadius: 5,
+    borderRadius: 15,
     marginHorizontal: 5,
     alignItems: 'center',
   },
