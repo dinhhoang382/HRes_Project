@@ -28,6 +28,7 @@ import EditEmployee from './src/Employee/EditEmployee';
 import AddFood from './src/FoodManager/AddFood';
 import EditFood from './src/FoodManager/EditFood';
 import CategoryManagement from './src/FoodManager/CategoryManage';
+import SplashScreen from './src/SplashScreen';
 const Stack = createNativeStackNavigator();
 const App = () => {
   const isDarkMode = useColorScheme() === 'dark';
@@ -44,6 +45,7 @@ const App = () => {
           backgroundColor={backgroundStyle.backgroundColor}
         />
         <Stack.Navigator screenOptions={{headerShown: false}}>
+          <Stack.Screen name="SplashScreen" component={SplashScreen} />
           <Stack.Screen name="Login" component={Login} />
           <Stack.Screen name="DrawerNavigation" component={DrawerNavigation} />
           <Stack.Screen name="TableDetail" component={TableDetail} />
