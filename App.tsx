@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   SafeAreaView,
   StatusBar,
@@ -29,12 +29,31 @@ import AddFood from './src/FoodManager/AddFood';
 import EditFood from './src/FoodManager/EditFood';
 import CategoryManagement from './src/FoodManager/CategoryManage';
 import SplashScreen from './src/SplashScreen';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 const Stack = createNativeStackNavigator();
 const App = () => {
   const isDarkMode = useColorScheme() === 'dark';
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
+  const [isFirstLaunch, setIsFirstLaunch] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    const checkFirstLaunch = async () => {
+      const firstLaunch = await AsyncStorage.getItem('hasLaunched');
+      if (firstLaunch === null) {
+        await AsyncStorage.setItem('hasLaunched', 'true');
+        setIsFirstLaunch(true);
+      } else {
+        setIsFirstLaunch(false);
+      }
+    };
+    checkFirstLaunch();
+  }, []);
+
+  if (isFirstLaunch === null) {
+    return null; // Optionally, a loading spinner can be shown here .
+  }
 
   return (
     <GestureHandlerRootView style={{flex: 1}}>
@@ -45,8 +64,11 @@ const App = () => {
           backgroundColor={backgroundStyle.backgroundColor}
         />
         <Stack.Navigator screenOptions={{headerShown: false}}>
-          <Stack.Screen name="SplashScreen" component={SplashScreen} />
-          <Stack.Screen name="Login" component={Login} />
+          {isFirstLaunch ? (
+            <Stack.Screen name="Splash" component={SplashScreen} />
+          ) : (
+            <Stack.Screen name="Login" component={Login} />
+          )}
           <Stack.Screen name="DrawerNavigation" component={DrawerNavigation} />
           <Stack.Screen name="TableDetail" component={TableDetail} />
           <Stack.Screen name="OrderScreen" component={OrderScreen} />

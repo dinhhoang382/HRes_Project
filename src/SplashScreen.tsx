@@ -1,22 +1,23 @@
 import {Image, ImageBackground, StyleSheet, Text, View} from 'react-native';
 import React, {Component, useEffect} from 'react';
-import { ActivityIndicator } from 'react-native-paper';
+import * as Progress from 'react-native-progress';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const SplashScreen = ({navigation}: {navigation: any}) => {
-  // useEffect(() => {
-  //   const timer = setTimeout(() => {
-  //     navigation.navigate('Login');
-  //   }, 3000);
-  //   return () => clearTimeout(timer); // Xóa timer khi component unmount
-  // }, [navigation]);
   return (
     <View style={styles.container}>
-      <Image 
+      <Image
         source={require('../image/logo/icon_login.png')} // Đường dẫn đến hình ảnh logo của bạn
         style={styles.logo}
       />
-      {/* <Text style={styles.text}>SplashScreen</Text> */}
-      <ActivityIndicator size={30} color="blue" style={styles.loading} />
+      <Progress.Bar
+        // size={30}
+        progress={0.3}
+        indeterminate={true}
+        color="black"
+        style={styles.loading}
+        
+      />
     </View>
   );
 };
@@ -28,13 +29,12 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    // backgroundColor: '#3498db', // Màu nền của Splash Screen
     backgroundColor: '#fff',
   },
   logo: {
     width: 200,
-    height: 200, 
-    marginBottom: 20, 
+    height: 200,
+    marginBottom: 20,
   },
   text: {
     fontSize: 24,
@@ -42,6 +42,6 @@ const styles = StyleSheet.create({
     color: '#fff', // Màu chữ, đảm bảo tương phản với màu nền
   },
   loading: {
-    marginTop: 20, // Khoảng cách giữa text và loading indicator
+    marginTop: 20,// Khoảng cách giữa text và loading indicator
   },
 });

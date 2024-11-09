@@ -10,6 +10,7 @@ import {
   View,
   ActivityIndicator,
   TextInput,
+  BackHandler,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import auth from '@react-native-firebase/auth';
@@ -17,6 +18,7 @@ import {getUserDocument} from '../utils/userUtils';
 import {Formik} from 'formik';
 import * as Yup from 'yup';
 import Colors from '../color/colors';
+import { useFocusEffect } from '@react-navigation/native';
 
 // Xác thực dữ liệu với Yup
 const loginSchema = Yup.object().shape({
@@ -46,6 +48,20 @@ const Login = ({navigation}: {navigation: any}) => {
       setIsLoading(false);
     }
   };
+  // Handle back button press
+  useFocusEffect(
+    React.useCallback(() => {
+      const onBackPress = () => {
+        BackHandler.exitApp(); // Directly exit the app
+        return true; // Prevents default back action
+      };
+
+      BackHandler.addEventListener('hardwareBackPress', onBackPress);
+
+      return () =>
+        BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+    }, []),
+  );
 
   return (
     <ImageBackground
