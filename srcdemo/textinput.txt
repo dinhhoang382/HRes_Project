@@ -1,0 +1,26 @@
+View style={styles.formGroup}>
+        <Text style={styles.label}>Tên món ăn *</Text>
+        <TextInput
+          style={styles.input}
+          value={foodData.name}
+          onChangeText={text => setFoodData({...foodData, name: text})}
+          placeholder="Nhập tên món ăn"
+        />
+</View>
+formGroup: {
+    marginBottom: 15,
+  },
+label: {
+    fontSize: 16,
+    marginBottom: 5,
+    fontWeight: '500',
+    color: '#333',
+  },
+input: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
+    backgroundColor: '#fff',
+  },

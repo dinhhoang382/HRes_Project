@@ -187,7 +187,7 @@ const OrderScreen = ({route, navigation}: {route: any; navigation: any}) => {
       <TouchableOpacity
         style={styles.addButton}
         onPress={event => handleAddToCart(item, event)}>
-        <Icon name="plus-circle" color="#fff" size={24} />
+        <Icon name="plus-circle" color="#fff" size={30} />
       </TouchableOpacity>
     </View>
   );
@@ -308,6 +308,11 @@ const OrderScreen = ({route, navigation}: {route: any; navigation: any}) => {
             data={filteredItems}
             renderItem={renderFoodItem}
             keyExtractor={item => item.id}
+            ListEmptyComponent={
+              <Text style={styles.emptySearchText}>
+                Không tìm thấy món ăn nào!
+              </Text>
+            }
             contentContainerStyle={styles.flatListContent}
           />
           <CartAnimation
@@ -418,8 +423,8 @@ const styles = StyleSheet.create({
   },
   addButton: {
     backgroundColor: '#007AFF',
-    borderRadius: 5,
-    padding: 15,
+    borderRadius: 25,
+    padding: 18,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -554,6 +559,12 @@ const styles = StyleSheet.create({
   tabScrollContainer: {
     paddingHorizontal: 10,
     paddingVertical: 10,
+  },
+  emptySearchText: {
+    textAlign: 'center',
+    marginVertical: 20,
+    fontSize: 18,
+    color: '#888',
   },
 });
 

@@ -50,7 +50,14 @@ const AddEmployee = ({route, navigation}: {route: any; navigation: any}) => {
           address,
           role,
         });
-      Alert.alert('Thành công', 'Nhân viên đã được đăng ký thành công');
+      Alert.alert('Thành công', 'Nhân viên đã được đăng ký thành công', [
+        {
+          text: 'OK',
+          onPress: () => {
+            navigation.navigate('ManageEmployeeScreen');
+          },
+        },
+      ]);
       // Clear the form
       setName('');
       setPosition('');
