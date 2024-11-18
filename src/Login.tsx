@@ -9,16 +9,15 @@ import {
   TouchableOpacity,
   View,
   ActivityIndicator,
-  TextInput,
   BackHandler,
 } from 'react-native';
-import Icon from 'react-native-vector-icons/FontAwesome';
 import auth from '@react-native-firebase/auth';
 import {getUserDocument} from '../utils/userUtils';
 import {Formik} from 'formik';
 import * as Yup from 'yup';
 import Colors from '../color/colors';
-import { useFocusEffect } from '@react-navigation/native';
+import {useFocusEffect} from '@react-navigation/native';
+import {TextInput} from 'react-native-paper';
 
 // Xác thực dữ liệu với Yup
 const loginSchema = Yup.object().shape({
@@ -52,7 +51,7 @@ const Login = ({navigation}: {navigation: any}) => {
   useFocusEffect(
     React.useCallback(() => {
       const onBackPress = () => {
-        BackHandler.exitApp(); // Directly exit the app
+        BackHandler.exitApp();
         return true; // Prevents default back action
       };
 
@@ -93,38 +92,34 @@ const Login = ({navigation}: {navigation: any}) => {
               touched,
             }) => (
               <View style={{width: '100%', alignItems: 'center'}}>
-                <View style={styles.container1}>
-                  <TextInput
-                    style={styles.input}
-                    placeholder="Email"
-                    value={values.email}
-                    onChangeText={handleChange('email')}
-                    onBlur={handleBlur('email')}
-                    keyboardType="email-address"
-                    autoCapitalize="none"
-                  />
-                </View>
+                <TextInput
+                  style={[styles.input,{ marginBottom: 10}]}
+                  placeholder="Email"
+                  mode='outlined'
+                  value={values.email}
+                  onChangeText={handleChange('email')}
+                  onBlur={handleBlur('email')}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                />
                 {touched.email && errors.email ? (
                   <Text style={styles.errorText}>{errors.email}</Text>
                 ) : null}
-                <View style={styles.container1}>
-                  <TextInput
-                    style={styles.input}
-                    placeholder="Mật khẩu"
-                    secureTextEntry={showPassword}
-                    value={values.password}
-                    onChangeText={handleChange('password')}
-                    onBlur={handleBlur('password')}
-                  />
-                  <TouchableOpacity
-                    onPress={() => setShowPassword(!showPassword)}>
-                    <Icon
-                      name={showPassword ? 'eye-slash' : 'eye'}
-                      size={20}
-                      color="gray"
+                <TextInput
+                  style={styles.input}
+                  placeholder="Mật khẩu"
+                  mode='outlined'
+                  secureTextEntry={showPassword}
+                  value={values.password}
+                  onChangeText={handleChange('password')}
+                  onBlur={handleBlur('password')}
+                  right={
+                    <TextInput.Icon
+                      icon={showPassword ? 'eye' : 'eye-off'}
+                      onPress={() => setShowPassword(!showPassword)}
                     />
-                  </TouchableOpacity>
-                </View>
+                  }
+                />
                 {touched.password && errors.password ? (
                   <Text style={styles.errorText}>{errors.password}</Text>
                 ) : null}
@@ -166,19 +161,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 100,
   },
-  container1: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: 'gray',
-    backgroundColor: 'white',
-    width: '80%',
-    height: 60,
-    marginVertical: 10,
-    paddingHorizontal: 10,
-  },
   text: {
     color: 'black',
     fontSize: 18,
@@ -186,9 +168,9 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   input: {
-    width: '80%',
-    height: 50,
-    fontSize: 16,
+    width: '90%',
+    height: 60,
+    fontSize: 18,
     paddingHorizontal: 10,
     borderColor: 'gray',
     backgroundColor: 'white',

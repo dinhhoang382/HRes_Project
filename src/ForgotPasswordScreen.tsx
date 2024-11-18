@@ -14,6 +14,7 @@ import auth from '@react-native-firebase/auth';
 import {Button} from 'react-native-paper';
 import BackButton from '../navigation/backButton';
 import Colors from '../color/colors';
+import {SafeAreaView} from 'react-native';
 
 const ForgotPasswordScreen = ({navigation}: {navigation: any}) => {
   const [loading, setLoading] = useState(false);
@@ -30,12 +31,16 @@ const ForgotPasswordScreen = ({navigation}: {navigation: any}) => {
     setError('');
     try {
       await auth().sendPasswordResetEmail(email);
-      Alert.alert('Thông báo', 'Email khôi phục mật khẩu đã được gửi.', [
-        {
-          text: 'OK',
-          onPress: () => navigation.navigate('Login'),
-        },
-      ]);
+      Alert.alert(
+        'Thông báo',
+        'Email khôi phục mật khẩu đã được gửi qua email!.',
+        [
+          {
+            text: 'OK',
+            onPress: () => navigation.navigate('Login'),
+          },
+        ],
+      );
     } catch (error: any) {
       if (error.code === 'auth/user-not-found') {
         setError('Email không tồn tại trong hệ thống.');
@@ -49,67 +54,70 @@ const ForgotPasswordScreen = ({navigation}: {navigation: any}) => {
     }
   };
   return (
-    <View style={styles.container}>
-      <View style={{flexDirection: 'row', margin: 10}}>
-        <BackButton />
-        <Text style={styles.title}>Quên mật khẩu</Text>
-      </View>
-      <Formik
-        initialValues={{email: ''}}
-        validationSchema={forgotPasswordSchema}
-        onSubmit={values => forgotPassword(values.email)}>
-        {({
-          handleChange,
-          handleBlur,
-          handleSubmit,
-          values,
-          errors,
-          touched,
-        }) => (
-          <View style={{padding: 15}}>
-            <Text style={{fontSize: 18, marginBottom: 10, color: 'red'}}>
-              Nhập email để khôi phục mật khẩu* :
-            </Text>
-            {error ? (
-              <Text style={{color: 'red', marginBottom: 10}}>{error}</Text>
-            ) : null}
-
-            <TextInput
-              placeholder="Email"
-              inputMode="email"
-              onChangeText={handleChange('email')}
-              onBlur={handleBlur('email')}
-              value={values.email}
-              keyboardType="email-address"
-              style={styles.input}
-            />
-
-            {touched.email && errors.email ? (
-              <Text style={{color: 'red', marginBottom: 10}}>
-                {errors.email}
+      <View style={styles.container}>
+        <View style={{flexDirection: 'row', margin: 10}}>
+          <BackButton />
+          <Text style={styles.title}>Quên mật khẩu</Text>
+        </View>
+        <Formik
+          initialValues={{email: ''}}
+          validationSchema={forgotPasswordSchema}
+          onSubmit={values => forgotPassword(values.email)}>
+          {({
+            handleChange,
+            handleBlur,
+            handleSubmit,
+            values,
+            errors,
+            touched,
+          }) => (
+            <View style={{padding: 15}}>
+              <Text style={{fontSize: 18, marginBottom: 10, color: 'red'}}>
+                Nhập email để khôi phục mật khẩu* :
               </Text>
-            ) : null}
+              {error ? (
+                <Text style={{color: 'red', marginBottom: 10}}>{error}</Text>
+              ) : null}
 
-            {error ? (
-              <Text style={{color: 'red', marginBottom: 10}}>{error}</Text>
-            ) : null}
+              <TextInput
+                placeholder="Email"
+                inputMode="email"
+                onChangeText={handleChange('email')}
+                onBlur={handleBlur('email')}
+                value={values.email}
+                keyboardType="email-address"
+                style={styles.input}
+              />
 
-            {loading ? (
-              <ActivityIndicator size="large" color="#0000ff" />
-            ) : (
-              <Button
-                mode="contained"
-                style={styles.button}
-                onPress={() => {
-                  handleSubmit();
-                }}>
-                <Text style={{color: 'white', fontSize: 18, fontWeight: 'bold'}}>Gửi</Text>
-              </Button>
-            )}
-          </View>
-        )}
-      </Formik>
-    </View>
+              {touched.email && errors.email ? (
+                <Text style={{color: 'red', marginBottom: 10}}>
+                  {errors.email}
+                </Text>
+              ) : null}
+
+              {error ? (
+                <Text style={{color: 'red', marginBottom: 10}}>{error}</Text>
+              ) : null}
+
+              {loading ? (
+                <ActivityIndicator size="large" color="#0000ff" />
+              ) : (
+                <Button
+                  mode="contained"
+                  style={styles.button}
+                  onPress={() => {
+                    handleSubmit();
+                  }}>
+                  <Text
+                    style={{color: 'white', fontSize: 18, fontWeight: 'bold'}}>
+                    Gửi
+                  </Text>
+                </Button>
+              )}
+            </View>
+          )}
+        </Formik>
+      </View>
   );
 };
 
@@ -126,7 +134,8 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   input: {
-    borderWidth: 1,
+    borderWidth: 2,
+    borderRadius: 10,
     padding: 15,
     fontSize: 18,
     backgroundColor: '#fff',
