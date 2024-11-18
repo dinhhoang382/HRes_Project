@@ -5,12 +5,13 @@ import {
   Text,
   TouchableOpacity,
   View,
+  TextInput,
 } from 'react-native';
 import React, {useState} from 'react';
 import {Formik} from 'formik';
 import * as Yup from 'yup';
 import auth from '@react-native-firebase/auth';
-import {Button, TextInput} from 'react-native-paper';
+import {Button} from 'react-native-paper';
 import BackButton from '../navigation/backButton';
 import Colors from '../color/colors';
 
@@ -76,12 +77,11 @@ const ForgotPasswordScreen = ({navigation}: {navigation: any}) => {
             <TextInput
               placeholder="Email"
               inputMode="email"
-              mode="outlined"
               onChangeText={handleChange('email')}
               onBlur={handleBlur('email')}
               value={values.email}
               keyboardType="email-address"
-              style={{marginBottom: 10, width: '100%',}}
+              style={styles.input}
             />
 
             {touched.email && errors.email ? (
@@ -99,17 +99,11 @@ const ForgotPasswordScreen = ({navigation}: {navigation: any}) => {
             ) : (
               <Button
                 mode="contained"
-                style={{
-                  marginTop: 5,
-                  marginBottom: 10,
-                  width: '60%',
-                  alignSelf: 'center',
-                  backgroundColor: Colors.AQUA_GREEN
-                }}
+                style={styles.button}
                 onPress={() => {
                   handleSubmit();
                 }}>
-                Gửi
+                <Text style={{color: 'white', fontSize: 18, fontWeight: 'bold'}}>Gửi</Text>
               </Button>
             )}
           </View>
@@ -130,5 +124,21 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     textAlign: 'center',
+  },
+  input: {
+    borderWidth: 1,
+    padding: 15,
+    fontSize: 18,
+    backgroundColor: '#fff',
+    marginBottom: 10,
+  },
+  button: {
+    marginTop: 5,
+    marginBottom: 10,
+    padding: 10,
+    justifyContent: 'center',
+    width: '60%',
+    alignSelf: 'center',
+    backgroundColor: Colors.AQUA_GREEN,
   },
 });
