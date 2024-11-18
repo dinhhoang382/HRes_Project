@@ -1,4 +1,12 @@
-import {StyleSheet, Text, View, Button, Alert, Image} from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  View,
+  Button,
+  Alert,
+  Image,
+  TouchableOpacity,
+} from 'react-native';
 import React, {useState, useEffect} from 'react';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
@@ -93,16 +101,16 @@ const UserProfileScreen = ({
       ) : (
         <Text style={styles.loadingText}>Đang tải...</Text>
       )}
-
-      {/* Nút Đổi mật khẩu */}
-      <View style={styles.buttonContainer}>
-        <Button title="Đổi mật khẩu" onPress={handleChangePassword} color="#007BFF" />
-      </View>
-
-      {/* Nút Đăng xuất */}
-      <View style={styles.buttonContainer}>
-        <Button title="Đăng xuất" onPress={showLogoutConfirmation} color="#FF0000" />
-      </View>
+      <TouchableOpacity
+        style={[styles.button, {backgroundColor: 'blue'}]}
+        onPress={handleChangePassword}>
+        <Text style={styles.buttonText}>Đổi mật khẩu</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={[styles.button, {backgroundColor: 'red'}]}
+        onPress={showLogoutConfirmation}>
+        <Text style={styles.buttonText}>Đăng xuất</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -112,20 +120,18 @@ export default UserProfileScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
-    backgroundColor: '#ffffff', // Changed to white for a cleaner look
+    padding: 10,
   },
   header: {
     flexDirection: 'row',
-    justifyContent: 'flex-start',
     alignItems: 'center',
     marginBottom: 20,
   },
   title: {
-    fontSize: 26, // Increased font size
+    fontSize: 22,
     fontWeight: 'bold',
-    color: '#333', // Darker color for better contrast
-    marginLeft: 10,
+    color: '#333',
+    alignSelf: 'center',
   },
   userImage: {
     width: 150,
@@ -154,9 +160,20 @@ const styles = StyleSheet.create({
     color: '#888',
     marginBottom: 20,
   },
-  buttonContainer: {
-    marginTop: 20,
-    borderRadius: 5,
-    overflow: 'hidden',
+  button: {
+    width: '55%',
+    height: 50,
+    borderRadius: 10,
+    marginBottom: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    alignSelf: 'center',
+  },
+  buttonText: {
+    color: '#fff',
+    textAlign: 'center',
+    padding: 10,
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
