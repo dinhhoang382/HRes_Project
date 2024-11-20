@@ -124,7 +124,7 @@ const Login = ({navigation}: {navigation: any}) => {
                 style={styles.input}
                 placeholder="Mật khẩu"
                 mode="outlined"
-                theme={{roundness: 20}}
+                theme={{roundness: 20,}}
                 secureTextEntry={showPassword}
                 value={values.password}
                 onChangeText={handleChange('password')}
@@ -189,9 +189,6 @@ const styles = StyleSheet.create({
     width: '90%',
     height: 60,
     fontSize: 18,
-    borderColor: 'gray',
-    backgroundColor: 'white',
-    color: 'black',
   },
   button: {
     width: '80%',

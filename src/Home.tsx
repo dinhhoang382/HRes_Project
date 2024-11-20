@@ -7,6 +7,7 @@ import {
   ActivityIndicator,
   TouchableWithoutFeedback,
   BackHandler,
+  Image,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import firestore from '@react-native-firebase/firestore';
@@ -14,7 +15,7 @@ import MenuIcon from '../navigation/menuIcon';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {Avatar} from 'react-native-paper';
 import {Alert} from 'react-native';
-import { useFocusEffect } from '@react-navigation/native';
+import {useFocusEffect} from '@react-navigation/native';
 
 //Define an interface for table data
 interface Table {
@@ -52,15 +53,16 @@ const Home = ({route, navigation}: {route: any; navigation: any}) => {
               onPress: () => BackHandler.exitApp(),
             },
           ],
-          { cancelable: false }
+          {cancelable: false},
         );
         return true; // Prevents default back action
       };
 
       BackHandler.addEventListener('hardwareBackPress', onBackPress);
 
-      return () => BackHandler.removeEventListener('hardwareBackPress', onBackPress);
-    }, [])
+      return () =>
+        BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+    }, []),
   );
   //Hàm lấy dữ liệu từ firestore
   useEffect(() => {
@@ -141,7 +143,11 @@ const Home = ({route, navigation}: {route: any; navigation: any}) => {
       <View style={styles.header}>
         <MenuIcon navigation={navigation} />
         <View style={styles.headerCenter}>
-          <Text style={styles.headerTitle}>Danh sách bàn</Text>
+          <Image
+            source={require('../image/logo/icon_login.png')}
+            style={styles.logo}
+          />
+          <Text style={styles.headerTitle}>HRes Project</Text>
         </View>
         <View style={styles.headerRight}>
           <Text style={styles.userName}>{UserData.name}</Text>
@@ -250,9 +256,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  logo: {
+    width: 25,
+    height: 25,
+    marginRight: 10,
+  },
   headerCenter: {
     flex: 1,
-    alignItems: 'center',
+    alignItems: 'flex-start',
+    marginStart: 10,
+    flexDirection: 'row',
   },
   filterButton: {
     alignSelf: 'flex-end',
