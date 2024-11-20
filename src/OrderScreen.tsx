@@ -8,10 +8,10 @@ import {
   FlatList,
   ActivityIndicator,
   Modal,
-  TextInput,
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
+import {TextInput} from 'react-native-paper';
 import firestore from '@react-native-firebase/firestore';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import {removeAccents} from '../text/removeAcess';
@@ -284,6 +284,18 @@ const OrderScreen = ({route, navigation}: {route: any; navigation: any}) => {
           <FlatList
             ListHeaderComponent={
               <>
+                <TextInput
+                  style={styles.searchInput}
+                  mode="outlined"
+                  theme={{roundness: 20}}
+                  placeholder="Tìm kiếm món ăn..."
+                  value={searchText}
+                  onChangeText={setSearchText}
+                />
+                <View style={{flexDirection: 'row', marginStart: 10,alignItems: 'center'}}>
+                  <Icon name="filter" size={20} color="#000" style={{marginEnd: 10}} />
+                  <Text style={styles.categoryTitle}>Danh mục:</Text>
+                </View>
                 <ScrollView
                   horizontal
                   showsHorizontalScrollIndicator={false}
@@ -297,12 +309,6 @@ const OrderScreen = ({route, navigation}: {route: any; navigation: any}) => {
                     />
                   ))}
                 </ScrollView>
-                <TextInput
-                  style={styles.searchInput}
-                  placeholder="Tìm kiếm món ăn..."
-                  value={searchText}
-                  onChangeText={setSearchText}
-                />
               </>
             }
             data={filteredItems}
@@ -341,7 +347,7 @@ const OrderScreen = ({route, navigation}: {route: any; navigation: any}) => {
               ref={cartButtonRef}
               style={styles.cartButton}
               onPress={() => setIsCartVisible(true)}>
-              <Icon name="shopping-cart" color="#fff" size={24} />
+              <Icon name="shopping-cart" color="#fff" size={28} />
               <Text style={styles.cartItemCount}>{cart.length}</Text>
             </TouchableOpacity>
           </View>
@@ -356,6 +362,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f5f5f5',
+  },
+  categoryTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
   },
   mainContainer: {
     flex: 1,
@@ -438,8 +448,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 10,
     backgroundColor: '#f8f8f8',
-    borderTopWidth: 1,
-    borderTopColor: '#ccc',
+    // borderTopWidth: 1,
     height: 90,
   },
   loadingContainer: {
@@ -536,10 +545,8 @@ const styles = StyleSheet.create({
     color: '#888',
   },
   searchInput: {
-    height: 40,
+    height: 45,
     borderColor: '#ccc',
-    borderWidth: 1,
-    borderRadius: 10,
     paddingHorizontal: 10,
     margin: 10,
     backgroundColor: '#fff',

@@ -166,6 +166,7 @@ const Home = ({route, navigation}: {route: any; navigation: any}) => {
           flexDirection: 'row',
           justifyContent: 'space-between',
           marginHorizontal: 10,
+          marginBottom: 5,
         }}>
         <TouchableOpacity style={styles.filterButton} onPress={toggleFilter}>
           <Text style={styles.filterButtonText}>
