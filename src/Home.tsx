@@ -190,7 +190,6 @@ const Home = ({route, navigation}: {route: any; navigation: any}) => {
       </View>
       <FlatList
         data={filteredTableData}
-        //-> keyExtractor là một hàm được sử dụng để trích xuất một khóa duy nhất cho mỗi phần tử trong mảng dữ liệu.
         keyExtractor={item => item.id}
         renderItem={renderTable} //-> render
         numColumns={isGridView ? 2 : 1} // Hiển thị 2 cột
@@ -220,9 +219,9 @@ const styles = StyleSheet.create({
   },
   tableItem: {
     flex: 1,
-    gap: 5,
-    margin: 10,
-    padding: 20,
+    gap: 2,
+    margin: 5,
+    padding: 10,
     borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',
@@ -231,20 +230,19 @@ const styles = StyleSheet.create({
     shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.3,
     shadowRadius: 3,
-    elevation: 0, // Hiệu ứng shadow đổ bóng
+    elevation: 2, // Hiệu ứng shadow đổ bóng
     borderWidth: 1,
     borderColor: '#ccc',
   },
   userName: {
     marginRight: 10,
-    fontSize: 16,
+    fontSize: 18,
     color: 'green',
   },
   available: {
     backgroundColor: '#c8e6c9',
   },
   occupied: {
-    // backgroundColor: '#ffcdd2'
     backgroundColor: '#ffcdd2',
   },
   tableText: {
