@@ -17,7 +17,6 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import {removeAccents} from '../text/removeAcess';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {ScrollView} from 'react-native-gesture-handler';
-import {Route} from 'lucide-react';
 import CartAnimation from '../reanimate/AnimationCart';
 import BackButton from '../navigation/backButton';
 interface FoodItem {
@@ -81,6 +80,7 @@ const OrderScreen = ({route, navigation}: {route: any; navigation: any}) => {
     handleSearch();
   }, [searchText]);
 
+  //tab
   useEffect(() => {
     if (activeTab === 'all') {
       setFilteredItems(foodItems);
@@ -98,65 +98,7 @@ const OrderScreen = ({route, navigation}: {route: any; navigation: any}) => {
     {id: 'appetizer', title: 'Khai vị'},
     {id: 'dessert', title: 'Tráng miệng'},
   ];
-
-  // Thêm states cho animation
-  const [isAnimating, setIsAnimating] = useState(false);
-  const [animationConfig, setAnimationConfig] = useState({
-    startPosition: {x: 0, y: 0},
-    endPosition: {x: 0, y: 0},
-  });
-  const cartButtonRef = useRef<View>(null);
-
-  // Thêm hàm đo vị trí giỏ hàng
-  const measureCartButton = () => {
-    return new Promise(resolve => {
-      cartButtonRef.current?.measure(
-        (
-          x: number,
-          y: number,
-          width: number,
-          height: number,
-          pageX: number,
-          pageY: number,
-        ) => {
-          resolve({x: pageX + width / 2, y: pageY + height / 2});
-        },
-      );
-    });
-  };
-
-  // Cập nhật hàm addToCart
-  const handleAddToCart = async (item: FoodItem, event: any) => {
-    const itemPosition = {
-      x: event.nativeEvent.pageX,
-      y: event.nativeEvent.pageY,
-    };
-
-    const cartPosition = await measureCartButton();
-
-    setAnimationConfig({
-      startPosition: itemPosition,
-      endPosition: cartPosition as {x: number; y: number},
-    });
-    setIsAnimating(true);
-
-    setCart(prevCart => {
-      const existingItem = prevCart.find(cartItem => cartItem.id === item.id);
-      if (existingItem) {
-        return prevCart.map(cartItem =>
-          cartItem.id === item.id
-            ? {...cartItem, quantity: cartItem.quantity + 1}
-            : cartItem,
-        );
-      }
-      return [...prevCart, {...item, quantity: 1}];
-    });
-  };
-
-  const handleAnimationEnd = () => {
-    setIsAnimating(false);
-  };
-
+  const cartButtonRef = useRef(null);
   // Thêm sản phẩm vào giỏ hàng
   const addToCart = (item: FoodItem) => {
     setCart(prevCart => {
@@ -186,7 +128,8 @@ const OrderScreen = ({route, navigation}: {route: any; navigation: any}) => {
       </View>
       <TouchableOpacity
         style={styles.addButton}
-        onPress={event => handleAddToCart(item, event)}>
+        // onPress={event => handleAddToCart(item, event)}
+        onPress={() => addToCart(item)}>
         <Icon name="plus-circle" color="#fff" size={30} />
       </TouchableOpacity>
     </View>
@@ -242,7 +185,7 @@ const OrderScreen = ({route, navigation}: {route: any; navigation: any}) => {
 
   const CartModal = () => (
     <Modal
-      animationType="none"
+      animationType="fade"
       transparent={true}
       visible={isCartVisible}
       onRequestClose={() => setIsCartVisible(false)}>
@@ -282,7 +225,7 @@ const OrderScreen = ({route, navigation}: {route: any; navigation: any}) => {
         style={styles.container}>
         <View style={styles.mainContainer}>
           <View style={{flexDirection: 'row', marginVertical: 5}}>
-            <BackButton/>
+            <BackButton />
             <Text style={styles.headerTitle}>Đặt món ăn</Text>
           </View>
           <FlatList
@@ -296,8 +239,18 @@ const OrderScreen = ({route, navigation}: {route: any; navigation: any}) => {
                   value={searchText}
                   onChangeText={setSearchText}
                 />
-                <View style={{flexDirection: 'row', marginStart: 10,alignItems: 'center'}}>
-                  <Icon name="filter" size={20} color="#000" style={{marginEnd: 10}} />
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    marginStart: 10,
+                    alignItems: 'center',
+                  }}>
+                  <Icon
+                    name="filter"
+                    size={20}
+                    color="#000"
+                    style={{marginEnd: 10}}
+                  />
                   <Text style={styles.categoryTitle}>Danh mục:</Text>
                 </View>
                 <ScrollView
@@ -324,12 +277,6 @@ const OrderScreen = ({route, navigation}: {route: any; navigation: any}) => {
               </Text>
             }
             contentContainerStyle={styles.flatListContent}
-          />
-          <CartAnimation
-            startPosition={animationConfig.startPosition}
-            endPosition={animationConfig.endPosition}
-            isAnimating={isAnimating}
-            onAnimationEnd={handleAnimationEnd}
           />
           <View style={styles.bottomButtonsContainer}>
             <TouchableOpacity
@@ -581,7 +528,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     color: '#333',
-  }
+  },
 });
 
 export default OrderScreen;
