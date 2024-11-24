@@ -10,6 +10,8 @@ import {
   Modal,
   KeyboardAvoidingView,
   Platform,
+  Animated,
+  Button,
 } from 'react-native';
 import {TextInput} from 'react-native-paper';
 import firestore from '@react-native-firebase/firestore';
@@ -17,7 +19,6 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import {removeAccents} from '../text/removeAcess';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {ScrollView} from 'react-native-gesture-handler';
-import CartAnimation from '../reanimate/AnimationCart';
 import BackButton from '../navigation/backButton';
 interface FoodItem {
   id: string;
@@ -128,7 +129,6 @@ const OrderScreen = ({route, navigation}: {route: any; navigation: any}) => {
       </View>
       <TouchableOpacity
         style={styles.addButton}
-        // onPress={event => handleAddToCart(item, event)}
         onPress={() => addToCart(item)}>
         <Icon name="plus-circle" color="#fff" size={30} />
       </TouchableOpacity>
@@ -183,32 +183,32 @@ const OrderScreen = ({route, navigation}: {route: any; navigation: any}) => {
     </TouchableOpacity>
   );
 
-  const CartModal = () => (
-    <Modal
-      animationType="fade"
-      transparent={true}
-      visible={isCartVisible}
-      onRequestClose={() => setIsCartVisible(false)}>
-      <View style={styles.modalContainer}>
-        <View style={styles.modalContent}>
-          <Text style={styles.modalTitle}>Đơn món ăn của bạn</Text>
-          <FlatList
-            data={cart}
-            renderItem={renderCartItem}
-            keyExtractor={item => item.id}
-            ListEmptyComponent={
-              <Text style={styles.emptyCartText}>Đơn món ăn trống!</Text>
-            }
-          />
-          <TouchableOpacity
-            style={styles.closeButton}
-            onPress={() => setIsCartVisible(false)}>
-            <Text style={styles.closeButtonText}>Đóng</Text>
-          </TouchableOpacity>
+  const CartModal = () => {
+    return (
+      <Modal
+        animationType="none"
+        transparent={true}
+        visible={isCartVisible}
+        onRequestClose={() => setIsCartVisible(false)}>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Đơn món ăn của bạn</Text>
+            <FlatList
+              data={cart}
+              renderItem={renderCartItem}
+              keyExtractor={item => item.id}
+              ListEmptyComponent={
+                <Text style={styles.emptyCartText}>Đơn món ăn trống!</Text>
+              }
+            />
+            <Button
+              title='ĐÓNG'
+              onPress={() => setIsCartVisible(false)}/>
+          </View>
         </View>
-      </View>
-    </Modal>
-  );
+      </Modal>
+    );
+  };
 
   if (isLoading) {
     return (
@@ -477,17 +477,6 @@ const styles = StyleSheet.create({
   },
   removeButton: {
     padding: 5,
-  },
-  closeButton: {
-    backgroundColor: '#007AFF',
-    borderRadius: 5,
-    padding: 10,
-    alignItems: 'center',
-    marginTop: 10,
-  },
-  closeButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
   },
   emptyCartText: {
     textAlign: 'center',

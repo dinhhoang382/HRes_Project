@@ -105,12 +105,12 @@ const Home = ({route, navigation}: {route: any; navigation: any}) => {
         onPress={() => handleBookTable(item)}>
         <Text style={styles.tableText}>
           Số Bàn:{' '}
-          <Text style={{fontSize: 26, color: 'blue'}}>{item.table_number}</Text>
+          <Text style={{fontSize: 30, color: 'blue'}}>{item.table_number}</Text>
         </Text>
-        <Text style={styles.tableText}>Sức chứa: {item.seats} người</Text>
         <Text style={styles.tableText}>
           {item.status === 'available' ? 'Bàn Trống' : 'Đang sử dụng'}
         </Text>
+        <Text style={styles.tableText}>Sức chứa: {item.seats} người</Text>
       </TouchableOpacity>
     );
   };
