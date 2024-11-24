@@ -19,6 +19,7 @@ import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {ScrollView} from 'react-native-gesture-handler';
 import {Route} from 'lucide-react';
 import CartAnimation from '../reanimate/AnimationCart';
+import BackButton from '../navigation/backButton';
 interface FoodItem {
   id: string;
   name: string;
@@ -92,7 +93,6 @@ const OrderScreen = ({route, navigation}: {route: any; navigation: any}) => {
 
   const tabs = [
     {id: 'all', title: 'Tất cả'},
-    {id: 'main', title: 'Đồ ăn chính'},
     {id: 'drink', title: 'Đồ uống'},
     {id: 'oyster', title: 'Hàu'},
     {id: 'appetizer', title: 'Khai vị'},
@@ -242,7 +242,7 @@ const OrderScreen = ({route, navigation}: {route: any; navigation: any}) => {
 
   const CartModal = () => (
     <Modal
-      animationType="slide"
+      animationType="none"
       transparent={true}
       visible={isCartVisible}
       onRequestClose={() => setIsCartVisible(false)}>
@@ -281,6 +281,10 @@ const OrderScreen = ({route, navigation}: {route: any; navigation: any}) => {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.container}>
         <View style={styles.mainContainer}>
+          <View style={{flexDirection: 'row', marginVertical: 5}}>
+            <BackButton/>
+            <Text style={styles.headerTitle}>Đặt món ăn</Text>
+          </View>
           <FlatList
             ListHeaderComponent={
               <>
@@ -573,6 +577,11 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: '#888',
   },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#333',
+  }
 });
 
 export default OrderScreen;

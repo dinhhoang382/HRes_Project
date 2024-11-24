@@ -18,14 +18,6 @@ interface OrderItem {
   food_name: string;
 }
 
-interface PaymentScreenProps {
-  route: {
-    params: {
-      invoiceId: string;
-    };
-  };
-}
-
 const PaymentScreen = ({route, navigation}: {route: any; navigation: any}) => {
   const {invoiceId, table_id} = route.params;
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
@@ -118,12 +110,12 @@ const PaymentScreen = ({route, navigation}: {route: any; navigation: any}) => {
       batch.set(
         invoiceRef,
         {
-          date: firestore.FieldValue.serverTimestamp(),
+          date: null,
           total_amount: 0,
           user_id: null,
-          status: 'pending',
+          status: 'available',
           paid_at: null,
-          table_number: tableNumber, // Keeping the same table number, change if needed
+          table_number: tableNumber, 
         },
         {merge: false},
       ); // This overwrites the entire document

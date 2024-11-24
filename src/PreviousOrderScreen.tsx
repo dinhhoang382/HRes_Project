@@ -33,7 +33,7 @@ const PreviousOrderScreen = ({
 }) => {
   const {orders, table_number, userId, invoiceId, table_id} =
     route.params || {};
-  console.log('T, ID: ', table_number, userId, invoiceId, table_id);
+  // console.log('T, ID: ', table_number, userId, invoiceId, table_id);
   const [previousOrders, setPreviousOrders] = useState<CartItem[]>([]);
   useEffect(() => {
     if (route.params && route.params.orders && route.params.table_number) {

@@ -24,7 +24,7 @@ interface OrderItem {
 }
 const TableDetail = ({route, navigation}: {route: any; navigation: any}) => {
   const {table, userId} = route.params; // Lấy thông tin bàn từ params
-  console.log('Table', table);
+  // console.log('Table', table);
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]); //danh sach mon an da dat
   const [invoiceDate, setInvoiceDate] = useState<string | null>(null);
   const [invoiceId, setInvoiceId] = useState<string | null>(null);
@@ -57,7 +57,7 @@ const TableDetail = ({route, navigation}: {route: any; navigation: any}) => {
               .doc(invoiceData.user_id)
               .get();
             const userData = userDoc.data();
-            const userName = userData?.name || '???';
+            const userName = userData?.name || '';
 
             // Lấy các món ăn từ subcollection 'invoice_items' của hóa đơn đó
             const orderItemsSnapshot = await firestore()
@@ -142,10 +142,8 @@ const TableDetail = ({route, navigation}: {route: any; navigation: any}) => {
       <Text style={styles.detail}>
         Trạng thái: {table.status === 'available' ? 'Có sẵn' : 'Đã đặt'}
       </Text>
-      {username && <Text style={styles.detail}>Người đặt: {username}</Text>}
-      {invoiceDate && (
-        <Text style={styles.detail}>Ngày lập hóa đơn: {invoiceDate}</Text>
-      )}
+      <Text style={styles.detail}>Người đặt: {username}</Text>
+      <Text style={styles.detail}>Ngày lập hóa đơn: {invoiceDate}</Text>
 
       {/* Hiển thị danh sách các món ăn đã đặt */}
       <Text style={styles.orderItemsTitle}>Món ăn đã đặt:</Text>
@@ -158,7 +156,7 @@ const TableDetail = ({route, navigation}: {route: any; navigation: any}) => {
           renderItem={({item}) => renderOrderItem(item)}
         />
       ) : (
-        <Text style={styles.orderItemsTitle}>
+        <Text style={[styles.orderItemsTitle, {alignSelf: 'center'}]}>
           Chưa có món ăn nào được đặt cho bàn này.
         </Text>
       )}
@@ -194,7 +192,7 @@ const TableDetail = ({route, navigation}: {route: any; navigation: any}) => {
             }
           }}
           // disabled={orderItems.length === 0}
-          >
+        >
           <Text style={styles.buttonText}>Thanh toán</Text>
         </TouchableOpacity>
       </View>
