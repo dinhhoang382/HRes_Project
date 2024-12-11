@@ -33,6 +33,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import EventListScreen from './src/EventList/EventListScreen';
 import AddEventScreen from './src/EventList/AddEventScreen';
 import EventDetails from './src/EventList/EventDetailScreen';
+import PaymentHistoryDetail from './src/PaymentHistoryDetail';
+import ManageTableScreen from './src/ManageTableScreen';
 const Stack = createNativeStackNavigator();
 const App = () => {
   const isDarkMode = useColorScheme() === 'dark';
@@ -100,6 +102,14 @@ const App = () => {
           <Stack.Screen name="EventListScreen" component={EventListScreen} />
           <Stack.Screen name="AddEventScreen" component={AddEventScreen} />
           <Stack.Screen name="EventDetailScreen" component={EventDetails} />
+          <Stack.Screen
+            name="PaymentHistoryDetail"
+            component={PaymentHistoryDetail}
+          />
+          <Stack.Screen
+            name="ManageTableScreen"
+            component={ManageTableScreen}
+          />
         </Stack.Navigator>
       </NavigationContainer>
     </GestureHandlerRootView>

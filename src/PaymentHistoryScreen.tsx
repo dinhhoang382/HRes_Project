@@ -3,11 +3,13 @@ import {
   FlatList,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import firestore from '@react-native-firebase/firestore';
 import BackButton from '../navigation/backButton';
+import {Picker} from '@react-native-picker/picker';
 
 interface PaymentHistoryItem {
   invoiceId: string;
@@ -27,6 +29,10 @@ const PaymentHistoryScreen = ({
     [],
   );
   const [loading, setLoading] = useState(true);
+  const [selectedMonth, setSelectedMonth] = useState<string>(
+    new Date().getMonth().toString(),
+  );
+
   useEffect(() => {
     const fetchPaymentHistory = async () => {
       try {
@@ -53,8 +59,17 @@ const PaymentHistoryScreen = ({
     fetchPaymentHistory();
   }, []);
 
+  const filteredPaymentHistory = paymentHistory.filter(item => {
+    const paymentDate = new Date(item.paid_at.seconds * 1000);
+    return paymentDate.getMonth().toString() === selectedMonth;
+  });
+
   const renderPaymentItem = ({item}: {item: PaymentHistoryItem}) => (
-    <View style={styles.historyItem}>
+    <TouchableOpacity
+      style={styles.historyItem}
+      onPress={() =>
+        navigation.navigate('PaymentHistoryDetail', {invoiceId: item.invoiceId})
+      }>
       <Text style={styles.invoiceText}>Hóa đơn ID: {item.invoiceId}</Text>
       <Text style={styles.detailsText}>Bàn số: {item.tableNumber}</Text>
       <Text style={styles.detailsText}>
@@ -68,7 +83,7 @@ const PaymentHistoryScreen = ({
         Thời gian thanh toán:{' '}
         {new Date(item.paid_at.seconds * 1000).toLocaleString('vi-VN')}
       </Text>
-    </View>
+    </TouchableOpacity>
   );
 
   if (loading) {
@@ -81,12 +96,20 @@ const PaymentHistoryScreen = ({
   }
   return (
     <View style={styles.container}>
-       <View style={{flexDirection: 'row', justifyContent: 'flex-start'}}>
+      <View style={{flexDirection: 'row', justifyContent: 'flex-start'}}>
         <BackButton />
         <Text style={styles.title}>Lịch sử thanh toán</Text>
       </View>
+      <Picker
+        selectedValue={selectedMonth}
+        onValueChange={itemValue => setSelectedMonth(itemValue)}
+        style={styles.picker}>
+        {Array.from({length: 12}, (_, i) => (
+          <Picker.Item key={i} label={`Tháng ${i + 1}`} value={i.toString()} />
+        ))}
+      </Picker>
       <FlatList
-        data={paymentHistory}
+        data={filteredPaymentHistory}
         renderItem={renderPaymentItem}
         keyExtractor={item => item.invoiceId}
       />
@@ -140,5 +163,10 @@ const styles = StyleSheet.create({
     marginTop: 10,
     fontSize: 16,
     color: '#007AFF',
+  },
+  picker: {
+    height: 50,
+    width: '100%',
+    marginBottom: 16,
   },
 });

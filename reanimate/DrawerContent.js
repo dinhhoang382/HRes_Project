@@ -98,6 +98,14 @@ export function DrawerContent(props) {
               label="Quản lý doanh thu"
               onPress={() => props.navigation.navigate('PaymentHistoryRevenue')}
             />
+            <DrawerItem
+              icon={({color, size}) => (
+                <Icon name="table" color={color} size={size} />
+              )}
+              label="Quản lý bàn đặt"
+              onPress={() => props.navigation.navigate('ManageTableScreen')}
+            />
+
           </Drawer.Section>
 
           <Divider style={styles.divider} />

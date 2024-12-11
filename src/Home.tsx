@@ -130,21 +130,24 @@ const Home = ({route, navigation}: {route: any; navigation: any}) => {
   const renderTable = ({item}: {item: Table}) => {
     return (
       <TouchableOpacity
-        style={[
-          styles.tableItem,
-          item.status === 'ordered' ? styles.occupied : styles.available,
-        ]}
-        onPress={() => handleBookTable(item)}>
-        <Text style={styles.tableText}>
-          Số Bàn:{' '}
-          <Text style={{fontSize: 30, color: 'blue'}}>{item.table_number}</Text>
-        </Text>
-        <Text style={styles.tableText}>
-          {item.status === 'available' ? 'Bàn Trống' : 'Đang sử dụng'}
-        </Text>
-        <Text style={styles.tableText}>Sức chứa: {item.seats} người</Text>
-      </TouchableOpacity>
-    );
+      style={[
+        styles.tableItem,
+        item.status === 'ordered' ? styles.occupied : styles.available,
+      ]}
+      onPress={() => handleBookTable(item)}>
+      <View style={styles.tableIconContainer}>
+        <Image
+          source={require('../image/foods/table_icon.png')} // Replace with your table icon path
+          style={styles.tableIcon}
+        />
+        <Text style={styles.tableNumber}>{item.table_number}</Text>
+      </View>
+      <Text style={styles.tableText}>
+        {item.status === 'available' ? 'Bàn Trống' : 'Đang sử dụng'}
+      </Text>
+      <Text style={styles.tableText}>Sức chứa: {item.seats} người</Text>
+    </TouchableOpacity>
+  );
   };
   // Hiển thị khi đang loading
   if (isLoading) {
@@ -240,7 +243,7 @@ const Home = ({route, navigation}: {route: any; navigation: any}) => {
           onPress={() => {
             navigation.navigate('EventListScreen');
           }}>
-          <Text style={styles.addButtonText}>Thêm Sự Kiện</Text>
+          <Text style={styles.addButtonText}>Quản lý Sự Kiện</Text>
         </TouchableOpacity>
       </View>
       <View>
@@ -397,6 +400,21 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 10,
     marginTop: 20,
+  },
+  tableIconContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 5,
+  },
+  tableIcon: {
+    width: 40, 
+    height: 40, 
+    marginRight: 10,
+  },
+  tableNumber: {
+    fontSize: 30,
+    color: 'blue',
+    fontWeight: 'bold'
   },
 });
 export default Home;
