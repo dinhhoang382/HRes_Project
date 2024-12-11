@@ -30,6 +30,9 @@ import EditFood from './src/FoodManager/EditFood';
 import CategoryManagement from './src/FoodManager/CategoryManage';
 import SplashScreen from './src/SplashScreen';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import EventListScreen from './src/EventList/EventListScreen';
+import AddEventScreen from './src/EventList/AddEventScreen';
+import EventDetails from './src/EventList/EventDetailScreen';
 const Stack = createNativeStackNavigator();
 const App = () => {
   const isDarkMode = useColorScheme() === 'dark';
@@ -94,12 +97,13 @@ const App = () => {
           <Stack.Screen name="AddFood" component={AddFood} />
           <Stack.Screen name="EditFood" component={EditFood} />
           <Stack.Screen name="CategoryManage" component={CategoryManagement} />
+          <Stack.Screen name="EventListScreen" component={EventListScreen} />
+          <Stack.Screen name="AddEventScreen" component={AddEventScreen} />
+          <Stack.Screen name="EventDetailScreen" component={EventDetails} />
         </Stack.Navigator>
       </NavigationContainer>
     </GestureHandlerRootView>
   );
 };
-
-const styles = StyleSheet.create({});
 
 export default App;

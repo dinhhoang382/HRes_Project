@@ -7,29 +7,29 @@ import { Picker } from '@react-native-picker/picker';
 const screenWidth = Dimensions.get('window').width;
 
 const RevenueChart = () => {
-  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1); // Mặc định là tháng hiện tại
+  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
   const [chartData, setChartData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [noData, setNoData] = useState(false); // State để xác định có dữ liệu hay không
+  const [khongCoDuLieu, setKhongCoDuLieu] = useState(false);
   const [months] = useState([
-    { label: 'January', value: 1 },
-    { label: 'February', value: 2 },
-    { label: 'March', value: 3 },
-    { label: 'April', value: 4 },
-    { label: 'May', value: 5 },
-    { label: 'June', value: 6 },
-    { label: 'July', value: 7 },
-    { label: 'August', value: 8 },
-    { label: 'September', value: 9 },
-    { label: 'October', value: 10 },
-    { label: 'November', value: 11 },
-    { label: 'December', value: 12 },
+    { label: 'Tháng 1', value: 1 },
+    { label: 'Tháng 2', value: 2 },
+    { label: 'Tháng 3', value: 3 },
+    { label: 'Tháng 4', value: 4 },
+    { label: 'Tháng 5', value: 5 },
+    { label: 'Tháng 6', value: 6 },
+    { label: 'Tháng 7', value: 7 },
+    { label: 'Tháng 8', value: 8 },
+    { label: 'Tháng 9', value: 9 },
+    { label: 'Tháng 10', value: 10 },
+    { label: 'Tháng 11', value: 11 },
+    { label: 'Tháng 12', value: 12 },
   ]);
 
   useEffect(() => {
     const fetchRevenueData = async () => {
       setLoading(true);
-      setNoData(false); // Reset trạng thái không có dữ liệu khi bắt đầu tải mới
+      setKhongCoDuLieu(false);
 
       try {
         const startOfMonth = new Date(new Date().getFullYear(), selectedMonth - 1, 1);
@@ -42,28 +42,28 @@ const RevenueChart = () => {
           .orderBy('paid_at')
           .get();
 
-        const dailyRevenue = {};
+        const doanhThuHangNgay = {};
 
         if (paymentHistorySnapshot.empty) {
-          setNoData(true); // Nếu không có dữ liệu, đặt trạng thái noData thành true
+          setKhongCoDuLieu(true);
         } else {
           paymentHistorySnapshot.docs.forEach(doc => {
             const data = doc.data();
-            const date = data.paid_at?.toDate().getDate(); // Kiểm tra nếu paid_at tồn tại
-            const totalAmount = data.totalAmount || 0; // Đảm bảo rằng totalAmount không undefined hoặc null
+            const date = data.paid_at?.toDate().getDate();
+            const totalAmount = data.totalAmount || 0;
 
             if (date) {
-              if (dailyRevenue[date]) {
-                dailyRevenue[date] += totalAmount;
+              if (doanhThuHangNgay[date]) {
+                doanhThuHangNgay[date] += totalAmount;
               } else {
-                dailyRevenue[date] = totalAmount;
+                doanhThuHangNgay[date] = totalAmount;
               }
             }
           });
 
-          const chartDataArray = Object.keys(dailyRevenue).map(day => ({
+          const chartDataArray = Object.keys(doanhThuHangNgay).map(day => ({
             day,
-            revenue: dailyRevenue[day],
+            revenue: doanhThuHangNgay[day],
           }));
 
           setChartData(chartDataArray);
@@ -101,7 +101,7 @@ const RevenueChart = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Revenue for {months[selectedMonth - 1].label}</Text>
+      <Text style={styles.title}>Doanh thu cho {months[selectedMonth - 1].label}</Text>
 
       <Picker
         selectedValue={selectedMonth}
@@ -113,19 +113,18 @@ const RevenueChart = () => {
         ))}
       </Picker>
 
-      {noData ? (
-        // Hiển thị thông báo nếu không có dữ liệu
-        <Text style={styles.noDataText}>No revenue data available for this month.</Text>
+      {khongCoDuLieu ? (
+        <Text style={styles.noDataText}>Không có dữ liệu doanh thu cho tháng này.</Text>
       ) : (
         <LineChart
           data={generateChartData()}
-          width={screenWidth - 32} // Chiều rộng của biểu đồ
+          width={screenWidth - 32}
           height={220}
           chartConfig={{
-            backgroundColor: '#e26a00',
-            backgroundGradientFrom: '#fb8c00',
-            backgroundGradientTo: '#ffa726',
-            decimalPlaces: 2, // Làm tròn số đến 2 chữ số thập phân
+            backgroundColor: '#0077b6', // Change to a light blue
+            backgroundGradientFrom: '#00b4d8', // Gradient start color
+            backgroundGradientTo: '#90e0ef',
+            decimalPlaces: 0,
             color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
             labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
             style: {
@@ -134,7 +133,7 @@ const RevenueChart = () => {
             propsForDots: {
               r: '6',
               strokeWidth: '2',
-              stroke: '#ffa726',
+              stroke: '#00b4d8',
             },
           }}
           bezier
@@ -150,20 +149,22 @@ const RevenueChart = () => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     padding: 16,
     justifyContent: 'center',
+    backgroundColor: '#f0f0f0',
   },
   title: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: 16,
+    color: '#333',
   },
   picker: {
     height: 50,
     width: 200,
     alignSelf: 'center',
+    marginBottom: 20,
   },
   noDataText: {
     fontSize: 16,

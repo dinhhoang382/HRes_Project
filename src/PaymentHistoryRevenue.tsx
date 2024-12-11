@@ -1,7 +1,13 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, StyleSheet, ActivityIndicator } from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {
+  View,
+  Text,
+  FlatList,
+  StyleSheet,
+  ActivityIndicator,
+} from 'react-native';
 import firestore from '@react-native-firebase/firestore';
-import RevenueChart from '../src/RevenueChart'
+import RevenueChart from '../src/RevenueChart';
 
 // Define a type for the payment history data
 type PaymentHistoryItem = {
@@ -11,11 +17,20 @@ type PaymentHistoryItem = {
   totalAmount: number;
   paid_at: any; // You might want to specify a more precise type here
   user_id: string;
+  userName: string;
   items: any[]; // Specify a more precise type if possible
 };
 
-const PaymentHistoryRevenue = ({route, navigation}:{route:any, navigation: any}) => {
-  const [paymentHistoryData, setPaymentHistoryData] = useState<PaymentHistoryItem[]>([]);
+const PaymentHistoryRevenue = ({
+  route,
+  navigation,
+}: {
+  route: any;
+  navigation: any;
+}) => {
+  const [paymentHistoryData, setPaymentHistoryData] = useState<
+    PaymentHistoryItem[]
+  >([]);
   const [loading, setLoading] = useState(true);
   const [totalRevenue, setTotalRevenue] = useState(0);
   const [totalOrders, setTotalOrders] = useState(0);
@@ -27,40 +42,52 @@ const PaymentHistoryRevenue = ({route, navigation}:{route:any, navigation: any})
           .collection('payment_history')
           .orderBy('paid_at', 'desc')
           .get();
-  
-        const paymentHistoryList = paymentHistorySnapshot.docs.map(doc => {
-          const data = doc.data();
-  
-          // Kiểm tra nếu dữ liệu hợp lệ và có đủ các trường cần thiết
-          return {
-            id: doc.id,
-            invoiceId: data.invoiceId || '',
-            tableNumber: data.tableNumber || '',
-            totalAmount: data.totalAmount || 0, // Đảm bảo totalAmount tồn tại
-            paid_at: data.paid_at || null,
-            user_id: data.user_id || '',
-            items: data.items || [],
-          };
-        });
-  
-        // Tính toán tổng doanh thu và số đơn hàng
+
+        const paymentHistoryList = await Promise.all(
+          paymentHistorySnapshot.docs.map(async doc => {
+            const data = doc.data();
+            let userName = '';
+
+            // Fetch user name from users collection
+            if (data.user_id) {
+              const userDoc = await firestore()
+                .collection('users')
+                .doc(data.user_id)
+                .get();
+              userName = userDoc.exists && userDoc.data() ? userDoc.data()!.name : 'Unknown User';
+            }
+
+            return {
+              id: doc.id,
+              invoiceId: data.invoiceId || '',
+              tableNumber: data.tableNumber || '',
+              totalAmount: data.totalAmount || 0,
+              paid_at: data.paid_at || null,
+              user_id: data.user_id || '',
+              userName,
+              items: data.items || [],
+            };
+          })
+        );
+
+        // Calculate total revenue and orders
         let revenue = 0;
         let orders = paymentHistoryList.length;
-  
+
         paymentHistoryList.forEach(item => {
           revenue += item.totalAmount;
         });
-  
+
         setTotalRevenue(revenue);
         setTotalOrders(orders);
         setPaymentHistoryData(paymentHistoryList);
       } catch (error) {
-        console.error("Error fetching payment history: ", error);
+        console.error('Error fetching payment history: ', error);
       } finally {
         setLoading(false);
       }
     };
-  
+
     fetchPaymentHistory();
   }, []);
 
@@ -68,29 +95,38 @@ const PaymentHistoryRevenue = ({route, navigation}:{route:any, navigation: any})
     return <ActivityIndicator size="large" color="#0000ff" />;
   }
 
-  const renderPaymentHistoryItem = ({ item }: { item: PaymentHistoryItem }) => (
+  const renderPaymentHistoryItem = ({item}: {item: PaymentHistoryItem}) => (
     <View style={styles.itemContainer}>
-      <Text style={styles.dateText}>Paid At: {new Date(item.paid_at.seconds * 1000).toLocaleString()}</Text>
-      <Text>Invoice ID: {item.invoiceId}</Text>
-      <Text>Table Number: {item.tableNumber}</Text>
-      <Text>Total Amount: ${item.totalAmount}</Text>
-      <Text>User ID: {item.user_id}</Text>
+      <Text style={styles.dateText}>
+        Thời gian đặt: {new Date(item.paid_at.seconds * 1000).toLocaleString()}
+      </Text>
+      <Text>Số bàn: {item.tableNumber}</Text>
+      <Text>Tổng doanh thu: {item.totalAmount} VNĐ</Text>
+      <Text>Người đặt: {item.userName}</Text>
     </View>
   );
 
   return (
     <View style={styles.container}>
       <View style={styles.summaryContainer}>
-        <Text style={styles.summaryText}>Total Revenue: ${totalRevenue}</Text>
-        <Text style={styles.summaryText}>Total Orders: {totalOrders}</Text>
+        <Text style={styles.summaryText}>
+          Tổng doanh thu: {totalRevenue} VNĐ
+        </Text>
+        <Text style={styles.summaryText}>Tổng số đơn: {totalOrders}</Text>
       </View>
-      <RevenueChart />
-      <FlatList
-        data={paymentHistoryData}
-        keyExtractor={(item) => item.id}
-        renderItem={renderPaymentHistoryItem}
-        ListEmptyComponent={<Text>No Payment History Available</Text>}
-      />
+      
+      <View style={styles.chartContainer}>
+        <RevenueChart />
+      </View>
+      
+      <View style={styles.listContainer}>
+        <FlatList
+          data={paymentHistoryData}
+          keyExtractor={item => item.id}
+          renderItem={renderPaymentHistoryItem}
+          ListEmptyComponent={<Text>Không có lịch sử doanh thu</Text>}
+        />
+      </View>
     </View>
   );
 };
@@ -98,23 +134,47 @@ const PaymentHistoryRevenue = ({route, navigation}:{route:any, navigation: any})
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#f5f5f5',
+    padding: 10,
   },
   summaryContainer: {
     marginBottom: 20,
+    padding: 10,
+    backgroundColor: '#ffffff',
+    borderRadius: 8,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   summaryText: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 10,
+    color: '#333',
+  },
+  chartContainer: {
+    marginBottom: 20,
+    backgroundColor: '#ffffff',
+    borderRadius: 8,
+    overflow: 'hidden',
   },
   itemContainer: {
     padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
+    borderBottomColor: '#ddd',
+    backgroundColor: '#ffffff',
+    borderRadius: 8,
+    marginBottom: 10,
   },
   dateText: {
     fontWeight: 'bold',
     marginBottom: 8,
+    color: '#555',
+  },
+  listContainer: {
+    flex: 1,
   },
 });
 

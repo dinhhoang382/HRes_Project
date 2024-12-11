@@ -8,6 +8,7 @@ import {
   TouchableWithoutFeedback,
   BackHandler,
   Image,
+  Dimensions,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import firestore from '@react-native-firebase/firestore';
@@ -16,6 +17,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import {Avatar} from 'react-native-paper';
 import {Alert} from 'react-native';
 import {useFocusEffect} from '@react-navigation/native';
+import Carousel from 'react-native-snap-carousel';
 
 //Define an interface for table data
 interface Table {
@@ -24,6 +26,13 @@ interface Table {
   reservation_id: string;
   table_number: number;
   status: 'available' | 'ordered';
+}
+interface Event {
+  id: string;
+  event_name: string;
+  date: string;
+  tables_reserved: number;
+  total_guests: number;
 }
 
 const Home = ({route, navigation}: {route: any; navigation: any}) => {
@@ -35,6 +44,7 @@ const Home = ({route, navigation}: {route: any; navigation: any}) => {
   const [filterStatus, setFilterStatus] = useState<
     'all' | 'available' | 'ordered'
   >('all');
+  const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([]);
   // Handle back button press
   useFocusEffect(
     React.useCallback(() => {
@@ -90,6 +100,28 @@ const Home = ({route, navigation}: {route: any; navigation: any}) => {
     // Cleanup subscription on unmount
     return () => unsubscribe();
   }, []);
+  const today = firestore.Timestamp.fromDate(new Date());
+  useEffect(() => {
+    const fetchUpcomingEvents = async () => {
+      const eventsRef = firestore().collection('events').orderBy('date', 'asc');
+
+      eventsRef.onSnapshot(
+        snapshot => {
+          const events: Event[] = [];
+          snapshot.forEach(doc => {
+            events.push({
+              ...(doc.data() as Event),
+              id: doc.id,
+            });
+          });
+          setUpcomingEvents(events);
+        },
+        error => console.log('Lỗi khi lấy dữ liệu sự kiện: ', error),
+      );
+    };
+
+    fetchUpcomingEvents();
+  }, []);
   //-> chi tiet dat ban
   const handleBookTable = (table: Table) => {
     navigation.navigate('TableDetail', {table, userId});
@@ -138,6 +170,21 @@ const Home = ({route, navigation}: {route: any; navigation: any}) => {
     if (filterStatus === 'all') return true;
     return table.status === filterStatus;
   });
+  console.log(upcomingEvents);
+  //SLIDE
+  const SLIDER_WIDTH = Dimensions.get('window').width;
+  const ITEM_WIDTH = SLIDER_WIDTH * 0.8;
+  const renderEventItem = ({item}: {item: Event}) => {
+    return (
+      <View style={styles.eventItem}>
+        <Text style={styles.eventTitle}>{item.event_name}</Text>
+        <Text style={styles.eventDate}>
+          Ngày: {new Date(item.date).toLocaleDateString()}
+        </Text>
+      </View>
+    );
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -161,6 +208,7 @@ const Home = ({route, navigation}: {route: any; navigation: any}) => {
           />
         </View>
       </View>
+
       <View
         style={{
           flexDirection: 'row',
@@ -187,7 +235,42 @@ const Home = ({route, navigation}: {route: any; navigation: any}) => {
             color="black"
           />
         </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.addButton}
+          onPress={() => {
+            navigation.navigate('EventListScreen');
+          }}>
+          <Text style={styles.addButtonText}>Thêm Sự Kiện</Text>
+        </TouchableOpacity>
       </View>
+      <View>
+        {upcomingEvents.length > 0 && (
+          <View style={{height: 200, marginBottom: 10}}>
+            <Text style={styles.sectionTitle}>Sự kiện sắp diễn ra</Text>
+            <FlatList
+              data={upcomingEvents}
+              keyExtractor={item => item.id}
+              renderItem={({item}) => (
+                <View style={styles.eventItem}>
+                  <Text style={styles.eventTitle}>{item.event_name}</Text>
+                  <Text style={styles.eventDate}>
+                    Ngày: {new Date(item.date).toLocaleDateString()}
+                  </Text>
+                </View>
+              )}
+            />
+          </View>
+        )}
+      </View>
+      <View
+        style={{
+          height: 2,
+          backgroundColor: '#ccc',
+          marginVertical: 5,
+          marginHorizontal: 10,
+        }}
+      />
+      <Text style={{fontSize: 20, fontWeight: 'bold', marginVertical: 5,}}>Đặt bàn</Text>
       <FlatList
         data={filteredTableData}
         keyExtractor={item => item.id}
@@ -273,6 +356,47 @@ const styles = StyleSheet.create({
   filterButtonText: {
     color: 'gray',
     fontSize: 20,
+  },
+  addButton: {
+    backgroundColor: '#4CAF50',
+    padding: 8,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  addButtonText: {
+    color: 'white',
+    fontSize: 16,
+  },
+  eventItem: {
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    padding: 10,
+    marginHorizontal: 10,
+    marginBottom: 5,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 5,
+  },
+  eventTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 5,
+  },
+  eventDate: {
+    fontSize: 14,
+    color: 'gray',
+    marginBottom: 10,
+  },
+  eventDescription: {
+    fontSize: 14,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    marginTop: 20,
   },
 });
 export default Home;
