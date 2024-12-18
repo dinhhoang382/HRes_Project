@@ -7,9 +7,12 @@ import {
   TouchableOpacity,
   Alert,
   ActivityIndicator,
+  Modal,
 } from 'react-native';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import firestore from '@react-native-firebase/firestore';
+import QRCode from 'react-native-qrcode-svg';
+import BackButton from '../navigation/backButton';
 
 interface OrderItem {
   food_item_id: string;
@@ -23,6 +26,8 @@ const PaymentScreen = ({route, navigation}: {route: any; navigation: any}) => {
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
   const [totalAmount, setTotalAmount] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [qrData, setQrData] = useState('');
+  const [isQRModalVisible, setIsQRModalVisible] = useState(false);
 
   useEffect(() => {
     const fetchInvoiceDetails = async () => {
@@ -35,6 +40,14 @@ const PaymentScreen = ({route, navigation}: {route: any; navigation: any}) => {
 
         if (invoiceData) {
           setTotalAmount(invoiceData.total_amount || 0);
+
+          // Generate QR code data for payment
+          const qrPaymentData = JSON.stringify({
+            invoiceId: invoiceId,
+            totalAmount: invoiceData.total_amount,
+            tableNumber: invoiceData.table_number,
+          });
+          setQrData(qrPaymentData);
 
           const itemsSnapshot = await firestore()
             .collection('invoices')
@@ -115,7 +128,7 @@ const PaymentScreen = ({route, navigation}: {route: any; navigation: any}) => {
           user_id: null,
           status: 'available',
           paid_at: null,
-          table_number: tableNumber, 
+          table_number: tableNumber,
         },
         {merge: false},
       ); // This overwrites the entire document
@@ -137,7 +150,6 @@ const PaymentScreen = ({route, navigation}: {route: any; navigation: any}) => {
       console.error('Error processing payment:', error);
       Alert.alert('Lỗi', 'Không thể xử lý thanh toán');
     }
-    
   };
 
   const renderOrderItem = ({item}: {item: OrderItem}) => (
@@ -170,7 +182,65 @@ const PaymentScreen = ({route, navigation}: {route: any; navigation: any}) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Thanh toán</Text>
+      <View style={{flexDirection: 'row'}}>
+        <BackButton />
+        <Text style={styles.title}>Thanh toán</Text>
+      </View>
+      {/* QR Code Section
+      <View style={styles.qrContainer}>
+        <Text style={styles.sectionTitle}>Quét mã QR để thanh toán</Text>
+        <View style={styles.qrCodeWrapper}>
+          <QRCode
+            value={qrData}
+            size={250}
+            color="black"
+            backgroundColor="white"
+          />
+        </View>
+        <Text style={styles.qrInstructions}>
+          Vui lòng quét mã QR để thanh toán hoặc sử dụng ứng dụng ngân hàng
+        </Text>
+      </View> */}
+      {/* QR Code Button */}
+      <TouchableOpacity 
+        style={styles.qrButton}
+        onPress={() => setIsQRModalVisible(true)}
+      >
+        <Text style={styles.qrButtonText}>Mở mã QR</Text>
+      </TouchableOpacity>
+      {/* QR Code Modal */}
+      <Modal
+        visible={isQRModalVisible}
+        onRequestClose={() => setIsQRModalVisible(false)}
+        transparent={false}
+        style={styles.modal}
+      >
+        <View style={styles.modalContent}>
+          <View style={styles.qrContainer}>
+            <Text style={styles.sectionTitle}>Quét mã QR để thanh toán</Text>
+            <View style={styles.qrCodeWrapper}>
+              <QRCode
+                value={qrData}
+                size={250}
+                color="black"
+                backgroundColor="white"
+              />
+            </View>
+            <Text style={styles.qrInstructions}>
+              Vui lòng quét mã QR để thanh toán hoặc sử dụng ứng dụng ngân hàng
+            </Text>
+          </View>
+          <TouchableOpacity 
+            style={styles.closeButton}
+            onPress={() => setIsQRModalVisible(false)}
+          >
+            <Text style={styles.closeButtonText}>Đóng</Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
+
+
+      {/* Order Items List */}
       <FlatList
         data={orderItems}
         renderItem={renderOrderItem}
@@ -267,6 +337,64 @@ const styles = StyleSheet.create({
   payButtonText: {
     color: '#fff',
     fontSize: 18,
+    fontWeight: 'bold',
+  },
+  qrContainer: {
+    alignItems: 'center',
+    marginBottom: 24,
+    backgroundColor: '#f9f9f9',
+    padding: 16,
+    borderRadius: 10,
+  },
+  qrCodeWrapper: {
+    backgroundColor: 'white',
+    padding: 16,
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+    marginVertical: 16,
+  },
+  qrInstructions: {
+    fontSize: 14,
+    color: '#666',
+    textAlign: 'center',
+    marginTop: 8,
+  },
+  modal: {
+    margin: 0,
+    justifyContent: 'center',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    padding: 20,
+    borderRadius: 12,
+    marginHorizontal: 20,
+  },
+  qrButton: {
+    backgroundColor: '#4CAF50',
+    padding: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginVertical: 10,
+  },
+  qrButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  closeButton: {
+    backgroundColor: '#ff6b6b',
+    padding: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 16,
+  },
+  closeButtonText: {
+    color: '#fff',
+    fontSize: 16,
     fontWeight: 'bold',
   },
 });

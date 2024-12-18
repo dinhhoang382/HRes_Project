@@ -26,6 +26,7 @@ interface FoodItem {
   price: number;
   category_id: string;
   image: string;
+  hidden: boolean;
 }
 
 const ManageFoodScreen = ({
@@ -40,6 +41,7 @@ const ManageFoodScreen = ({
   const [filteredItems, setFilteredItems] = useState<FoodItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchText, setSearchText] = useState('');
+  const [notification, setNotification] = useState('');
 
   //lấy dữ liệu từ firestore
   const fetchFoodItems = async () => {
@@ -48,6 +50,7 @@ const ManageFoodScreen = ({
       const foodList: FoodItem[] = snapshot.docs.map(doc => ({
         ...(doc.data() as FoodItem),
         id: doc.id,
+        hidden: doc.data().hidden || false,
       }));
       setFoodItems(foodList);
       setFilteredItems(foodList);
@@ -94,6 +97,18 @@ const ManageFoodScreen = ({
     }, []),
   );
 
+  const toggleHideFoodItem = async (item: FoodItem) => {
+    try {
+      await firestore().collection('food_items').doc(item.id).update({
+        hidden: !item.hidden,
+      });
+      fetchFoodItems(); // Refresh the list after updating
+      setNotification(`Món ăn đã được ${item.hidden ? 'hiện' : 'ẩn'}.`);
+    } catch (error) {
+      console.log('Error hiding food item:', error);
+    }
+  };
+
   const tabs = [
     {id: 'all', title: 'Tất cả'},
     {id: 'main', title: 'Đồ ăn chính'},
@@ -121,11 +136,11 @@ const ManageFoodScreen = ({
           }}
         />
         <Icon
-          name="hide-source"
+          name={item.hidden ? "visibility-off" : "visibility"}
           size={26}
           color="black"
           style={styles.icon}
-          onPress={() => {}}
+          onPress={() => toggleHideFoodItem(item)}
         />
         <Icon
           name="delete"
@@ -230,6 +245,11 @@ const ManageFoodScreen = ({
             contentContainerStyle={styles.flatListContent}
             showsVerticalScrollIndicator={false}
           />
+          {notification ? (
+            <View style={styles.notificationContainer}>
+              <Text style={styles.notificationText}>{notification}</Text>
+            </View>
+          ) : null}
         </View>
       </KeyboardAvoidingView>
     </GestureHandlerRootView>
@@ -463,5 +483,18 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: 'bold',
     marginBottom: 10,
+  },
+  notificationContainer: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: '#007AFF',
+    padding: 10,
+    alignItems: 'center',
+  },
+  notificationText: {
+    color: '#fff',
+    fontWeight: 'bold',
   },
 });

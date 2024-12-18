@@ -35,6 +35,7 @@ import AddEventScreen from './src/EventList/AddEventScreen';
 import EventDetails from './src/EventList/EventDetailScreen';
 import PaymentHistoryDetail from './src/PaymentHistoryDetail';
 import ManageTableScreen from './src/ManageTableScreen';
+import AllTables from './src/AllTableScreen';
 const Stack = createNativeStackNavigator();
 const App = () => {
   const isDarkMode = useColorScheme() === 'dark';
@@ -110,6 +111,7 @@ const App = () => {
             name="ManageTableScreen"
             component={ManageTableScreen}
           />
+          <Stack.Screen name='AllTableScreen' component={AllTables}/>
         </Stack.Navigator>
       </NavigationContainer>
     </GestureHandlerRootView>

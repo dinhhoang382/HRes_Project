@@ -104,10 +104,24 @@ const PreviousOrderScreen = ({
           return;
         }
 
+        // Lấy danh sách các món ăn hiện tại trong hóa đơn
+        const existingItemsSnapshot = await invoiceRef
+          .collection('invoice_items')
+          .get();
+        
+        const existingItems = new Map();
+        existingItemsSnapshot.docs.forEach(doc => {
+          const data = doc.data();
+          existingItems.set(data.food_item_id, {
+            docId: doc.id,
+            ...data,
+          });
+        });
+
         const invoiceData = invoiceDoc.data();
         let currentTotalAmount = invoiceData?.total_amount || 0;
 
-        // Tính toán tổng số tiền mới cho các món mới được thêm
+        // Tính toán tổng số tiền mới
         const newTotalAmount = previousOrders.reduce(
           (sum, item) => sum + item.price * item.quantity,
           currentTotalAmount,
@@ -116,17 +130,31 @@ const PreviousOrderScreen = ({
         // Tạo batch để thêm món và cập nhật hóa đơn
         const batch = firestore().batch();
 
+        // Xử lý từng món ăn
         previousOrders.forEach(item => {
-          const invoiceItemRef = firestore()
-            .collection('invoices')
-            .doc(invoiceId)
-            .collection('invoice_items')
-            .doc(); // Tạo document mới cho từng món ăn
-          batch.set(invoiceItemRef, {
-            food_item_id: item.id,
-            quantity: item.quantity,
-            price: item.price,
-          });
+          const existingItem = existingItems.get(item.id);
+          
+          if (existingItem) {
+            // Nếu món ăn đã tồn tại, cập nhật số lượng
+            const itemRef = invoiceRef
+              .collection('invoice_items')
+              .doc(existingItem.docId);
+            
+            batch.update(itemRef, {
+              quantity: existingItem.quantity + item.quantity,
+            });
+          } else {
+            // Nếu là món ăn mới, tạo document mới
+            const invoiceItemRef = invoiceRef
+              .collection('invoice_items')
+              .doc();
+            
+            batch.set(invoiceItemRef, {
+              food_item_id: item.id,
+              quantity: item.quantity,
+              price: item.price,
+            });
+          }
         });
 
         // Cập nhật lại tổng số tiền của hóa đơn
@@ -135,9 +163,7 @@ const PreviousOrderScreen = ({
         });
 
         await batch.commit();
-
         console.log('Hóa đơn và các món đã được cập nhật thành công!');
-
         navigation.navigate('Home');
       } else {
         handleOrder();

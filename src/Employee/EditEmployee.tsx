@@ -109,7 +109,7 @@ const EditEmployeeScreen = ({
         <Picker.Item label="Admin" value="admin" />
         <Picker.Item label="User" value="user" />
       </Picker>
-      <Button title="Update Employee" onPress={updateEmployee} />
+      <Button title="Cập nhật" onPress={updateEmployee} />
     </View>
   );
 };

@@ -162,7 +162,7 @@ const ManageTableScreen = ({navigation}: {navigation: any}) => {
           style={styles.deleteButton}
           onPress={() => {
             Alert.alert(
-              'Xác nhận x��a',
+              'Xác nhận xóa',
               `Bạn có chắc muốn xóa bàn ${item.table_number}?`,
               [
                 {text: 'Hủy', style: 'cancel'},

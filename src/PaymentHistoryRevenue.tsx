@@ -5,7 +5,9 @@ import {
   FlatList,
   StyleSheet,
   ActivityIndicator,
+  Button,
 } from 'react-native';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import firestore from '@react-native-firebase/firestore';
 import RevenueChart from '../src/RevenueChart';
 
@@ -34,12 +36,20 @@ const PaymentHistoryRevenue = ({
   const [loading, setLoading] = useState(true);
   const [totalRevenue, setTotalRevenue] = useState(0);
   const [totalOrders, setTotalOrders] = useState(0);
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [showDatePicker, setShowDatePicker] = useState(false);
 
   useEffect(() => {
     const fetchPaymentHistory = async () => {
+      setLoading(true);
       try {
+        const startOfDay = new Date(selectedDate.setHours(0, 0, 0, 0));
+        const endOfDay = new Date(selectedDate.setHours(23, 59, 59, 999));
+
         const paymentHistorySnapshot = await firestore()
           .collection('payment_history')
+          .where('paid_at', '>=', startOfDay)
+          .where('paid_at', '<=', endOfDay)
           .orderBy('paid_at', 'desc')
           .get();
 
@@ -89,7 +99,14 @@ const PaymentHistoryRevenue = ({
     };
 
     fetchPaymentHistory();
-  }, []);
+  }, [selectedDate]);
+
+  const onDateChange = (event: any, selectedDate?: Date) => {
+    setShowDatePicker(false);
+    if (selectedDate) {
+      setSelectedDate(selectedDate);
+    }
+  };
 
   if (loading) {
     return <ActivityIndicator size="large" color="#0000ff" />;
@@ -114,6 +131,16 @@ const PaymentHistoryRevenue = ({
         </Text>
         <Text style={styles.summaryText}>Tổng số đơn: {totalOrders}</Text>
       </View>
+      
+      <Button title="Chọn ngày" onPress={() => setShowDatePicker(true)} />
+      {showDatePicker && (
+        <DateTimePicker
+          value={selectedDate}
+          mode="date"
+          display="default"
+          onChange={onDateChange}
+        />
+      )}
       
       <View style={styles.chartContainer}>
         <RevenueChart />

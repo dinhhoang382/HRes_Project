@@ -27,6 +27,7 @@ interface FoodItem {
   price: number;
   category_id: string;
   image: string;
+  hidden: boolean;
 }
 
 interface CartItem extends FoodItem {
@@ -43,6 +44,7 @@ const OrderScreen = ({route, navigation}: {route: any; navigation: any}) => {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [isCartVisible, setIsCartVisible] = useState(false);
   const [searchText, setSearchText] = useState('');
+  const [notification, setNotification] = useState<string | null>(null);
 
   const fetchFoodItems = async () => {
     try {
@@ -84,10 +86,10 @@ const OrderScreen = ({route, navigation}: {route: any; navigation: any}) => {
   //tab
   useEffect(() => {
     if (activeTab === 'all') {
-      setFilteredItems(foodItems);
+      setFilteredItems(foodItems.filter(item => !item.hidden));
     } else {
       setFilteredItems(
-        foodItems.filter(item => item.category_id === activeTab),
+        foodItems.filter(item => item.category_id === activeTab && !item.hidden),
       );
     }
   }, [activeTab, foodItems]);
@@ -303,6 +305,11 @@ const OrderScreen = ({route, navigation}: {route: any; navigation: any}) => {
             </TouchableOpacity>
           </View>
         </View>
+        {notification && (
+          <View style={styles.notificationContainer}>
+            <Text style={styles.notificationText}>{notification}</Text>
+          </View>
+        )}
         <CartModal />
       </KeyboardAvoidingView>
     </GestureHandlerRootView>
@@ -359,7 +366,7 @@ const styles = StyleSheet.create({
     shadowOffset: {width: 0, height: 2}, // Vị trí của bóng
     shadowOpacity: 0.1, // Độ mờ của bóng
     shadowRadius: 4, // Bán kính bóng
-    elevation: 3, // Hiển thị bóng cho phần tử
+    elevation: 3, // Hiển th��� bóng cho phần tử
   },
   foodImage: {
     width: 80,
@@ -517,6 +524,19 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     color: '#333',
+  },
+  notificationContainer: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: '#ff4d4f',
+    padding: 10,
+    alignItems: 'center',
+  },
+  notificationText: {
+    color: '#fff',
+    fontSize: 16,
   },
 });
 

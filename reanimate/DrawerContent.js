@@ -14,7 +14,7 @@ import auth from '@react-native-firebase/auth';
 
 export function DrawerContent(props) {
   const {UserData} = props;
-  // console.log(UserData);
+  const isAdmin = UserData?.role === 'admin';
 
   return (
     <View style={styles.drawerContent}>
@@ -65,48 +65,50 @@ export function DrawerContent(props) {
           <Divider style={styles.divider} />
 
           {/* Management Section */}
-          <Drawer.Section style={styles.drawerSection}>
-            <Text style={styles.sectionTitle}>Quản lý</Text>
-            <DrawerItem
-              icon={({color, size}) => (
-                <Icon name="credit-card-outline" color={color} size={size} />
-              )}
-              label="Quản lý Thanh toán"
-              onPress={() => props.navigation.navigate('PaymentHistoryScreen')}
-            />
+          {isAdmin && (
+            <Drawer.Section style={styles.drawerSection}>
+              <Text style={styles.sectionTitle}>Quản lý</Text>
+              <DrawerItem
+                icon={({color, size}) => (
+                  <Icon name="credit-card-outline" color={color} size={size} />
+                )}
+                label="Quản lý Thanh toán"
+                onPress={() => props.navigation.navigate('PaymentHistoryScreen')}
+              />
 
-            <DrawerItem
-              icon={({color, size}) => (
-                <Icon name="account-group-outline" color={color} size={size} />
-              )}
-              label="Quản lý nhân viên"
-              onPress={() => props.navigation.navigate('ManageEmployeeScreen')}
-            />
+              <DrawerItem
+                icon={({color, size}) => (
+                  <Icon name="account-group-outline" color={color} size={size} />
+                )}
+                label="Quản lý nhân viên"
+                onPress={() => props.navigation.navigate('ManageEmployeeScreen')}
+              />
 
-            <DrawerItem
-              icon={({color, size}) => (
-                <Icon name="food-outline" color={color} size={size} />
-              )}
-              label="Quản lý thực đơn"
-              onPress={() => props.navigation.navigate('ManageFoodScreen')}
-            />
+              <DrawerItem
+                icon={({color, size}) => (
+                  <Icon name="food-outline" color={color} size={size} />
+                )}
+                label="Quản lý thực đơn"
+                onPress={() => props.navigation.navigate('ManageFoodScreen')}
+              />
 
-            <DrawerItem
-              icon={({color, size}) => (
-                <Icon name="chart-bar" color={color} size={size} />
-              )}
-              label="Quản lý doanh thu"
-              onPress={() => props.navigation.navigate('PaymentHistoryRevenue')}
-            />
-            <DrawerItem
-              icon={({color, size}) => (
-                <Icon name="table" color={color} size={size} />
-              )}
-              label="Quản lý bàn đặt"
-              onPress={() => props.navigation.navigate('ManageTableScreen')}
-            />
+              <DrawerItem
+                icon={({color, size}) => (
+                  <Icon name="chart-bar" color={color} size={size} />
+                )}
+                label="Quản lý doanh thu"
+                onPress={() => props.navigation.navigate('PaymentHistoryRevenue')}
+              />
+              <DrawerItem
+                icon={({color, size}) => (
+                  <Icon name="table" color={color} size={size} />
+                )}
+                label="Quản lý bàn đặt"
+                onPress={() => props.navigation.navigate('ManageTableScreen')}
+              />
 
-          </Drawer.Section>
+            </Drawer.Section>
+          )}
 
           <Divider style={styles.divider} />
 

@@ -130,24 +130,24 @@ const Home = ({route, navigation}: {route: any; navigation: any}) => {
   const renderTable = ({item}: {item: Table}) => {
     return (
       <TouchableOpacity
-      style={[
-        styles.tableItem,
-        item.status === 'ordered' ? styles.occupied : styles.available,
-      ]}
-      onPress={() => handleBookTable(item)}>
-      <View style={styles.tableIconContainer}>
-        <Image
-          source={require('../image/foods/table_icon.png')} // Replace with your table icon path
-          style={styles.tableIcon}
-        />
-        <Text style={styles.tableNumber}>{item.table_number}</Text>
-      </View>
-      <Text style={styles.tableText}>
-        {item.status === 'available' ? 'Bàn Trống' : 'Đang sử dụng'}
-      </Text>
-      <Text style={styles.tableText}>Sức chứa: {item.seats} người</Text>
-    </TouchableOpacity>
-  );
+        style={[
+          styles.tableItem,
+          item.status === 'ordered' ? styles.occupied : styles.available,
+        ]}
+        onPress={() => handleBookTable(item)}>
+        <View style={styles.tableIconContainer}>
+          <Image
+            source={require('../image/foods/table_icon.png')} // Replace with your table icon path
+            style={styles.tableIcon}
+          />
+          <Text style={styles.tableNumber}>{item.table_number}</Text>
+        </View>
+        <Text style={styles.tableText}>
+          {item.status === 'available' ? 'Bàn Trống' : 'Đang sử dụng'}
+        </Text>
+        <Text style={styles.tableText}>Sức chứa: {item.seats} người</Text>
+      </TouchableOpacity>
+    );
   };
   // Hiển thị khi đang loading
   if (isLoading) {
@@ -173,7 +173,7 @@ const Home = ({route, navigation}: {route: any; navigation: any}) => {
     if (filterStatus === 'all') return true;
     return table.status === filterStatus;
   });
-  console.log(upcomingEvents);
+  // console.log(upcomingEvents);
   //SLIDE
   const SLIDER_WIDTH = Dimensions.get('window').width;
   const ITEM_WIDTH = SLIDER_WIDTH * 0.8;
@@ -273,7 +273,16 @@ const Home = ({route, navigation}: {route: any; navigation: any}) => {
           marginHorizontal: 10,
         }}
       />
-      <Text style={{fontSize: 20, fontWeight: 'bold', marginVertical: 5,}}>Đặt bàn</Text>
+      <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+        <Text style={{fontSize: 20, fontWeight: 'bold', marginVertical: 5}}>
+          Đặt bàn
+        </Text>
+        <Text
+          style={styles.viewAllTablesButtonText}
+          onPress={() => navigation.navigate('AllTableScreen')}>
+          Xem tất cả
+        </Text>
+      </View>
       <FlatList
         data={filteredTableData}
         keyExtractor={item => item.id}
@@ -407,14 +416,23 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   tableIcon: {
-    width: 40, 
-    height: 40, 
+    width: 40,
+    height: 40,
     marginRight: 10,
   },
   tableNumber: {
     fontSize: 30,
     color: 'blue',
-    fontWeight: 'bold'
+    fontWeight: 'bold',
+  },
+  viewAllTablesButton: {
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  viewAllTablesButtonText: {
+    padding: 5,
+    color: 'blue',
+    fontSize: 18,
   },
 });
 export default Home;
