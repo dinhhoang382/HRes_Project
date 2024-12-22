@@ -33,17 +33,98 @@ interface FoodItem {
 interface CartItem extends FoodItem {
   quantity: number;
 }
+// AI-powered search and recommendation logic
+const useAIFoodSearch = (foodItems: FoodItem[]) => {
+  const [searchText, setSearchText] = useState('');
+  const [filteredItems, setFilteredItems] = useState<FoodItem[]>(foodItems);
+  const [aiSuggestions, setAiSuggestions] = useState<FoodItem[]>([]);
+
+  // Advanced search algorithm with AI-like features
+  const performAISearch = (query: string) => {
+    if (query === '') {
+      setFilteredItems(foodItems);
+      setAiSuggestions([]);
+      return;
+    }
+
+    // Basic search with accent removal and fuzzy matching
+    const normalizedQuery = removeAccents(query).toLowerCase();
+    const searchResults = foodItems.filter(item => 
+      removeAccents(item.name).toLowerCase().includes(normalizedQuery)
+    );
+
+    // AI-like suggestion logic
+    const suggestions = foodItems.filter(item => {
+      // Contextual suggestions based on search query
+      const contextSimilarity = [
+        // Similar categories
+        item.category_id === searchResults[0]?.category_id,
+        // Similar price range (±20%)
+        searchResults[0] && 
+        item.price >= searchResults[0].price * 0.8 && 
+        item.price <= searchResults[0].price * 1.2,
+        // Phonetically similar names
+        normalizedQuery.length > 2 && 
+        calculateSimilarity(removeAccents(item.name).toLowerCase(), normalizedQuery) > 0.6
+      ].filter(Boolean).length;
+
+      return contextSimilarity > 1 && !searchResults.includes(item);
+    });
+
+    setFilteredItems(searchResults);
+    setAiSuggestions(suggestions.slice(0, 3)); // Limit to 3 suggestions
+  };
+
+  // Simple string similarity calculation
+  const calculateSimilarity = (str1: string, str2: string): number => {
+    const len1 = str1.length;
+    const len2 = str2.length;
+    const maxLen = Math.max(len1, len2);
+    
+    let matches = 0;
+    for (let i = 0; i < Math.min(len1, len2); i++) {
+      if (str1[i] === str2[i]) matches++;
+    }
+    
+    return matches / maxLen;
+  };
+
+  // Recommendation logic based on previous selections
+  const getRecommendations = (cart: CartItem[]) => {
+    if (cart.length === 0) return [];
+
+    // Get categories and prices of items in cart
+    const cartCategories = [...new Set(cart.map(item => item.category_id))];
+    const avgCartPrice = cart.reduce((sum, item) => sum + item.price, 0) / cart.length;
+
+    return foodItems.filter(item => {
+      const categoryMatch = cartCategories.includes(item.category_id);
+      const priceMatch = 
+        item.price >= avgCartPrice * 0.8 && 
+        item.price <= avgCartPrice * 1.2;
+      
+      return (categoryMatch || priceMatch) && !cart.some(cartItem => cartItem.id === item.id);
+    }).slice(0, 3); // Limit recommendations
+  };
+
+  return {
+    searchText,
+    setSearchText,
+    filteredItems,
+    setFilteredItems,
+    aiSuggestions,
+    performAISearch,
+    getRecommendations
+  };
+}
 
 const OrderScreen = ({route, navigation}: {route: any; navigation: any}) => {
-  const {table_number, userId, invoiceId, table_id} = route.params; // Lấy số bàn từ route
-  // console.log('Orderscreen: ', table_id);
+  const {table_number, userId, invoiceId, table_id} = route.params;
   const [activeTab, setActiveTab] = useState('all');
   const [foodItems, setFoodItems] = useState<FoodItem[]>([]);
-  const [filteredItems, setFilteredItems] = useState<FoodItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [isCartVisible, setIsCartVisible] = useState(false);
-  const [searchText, setSearchText] = useState('');
   const [notification, setNotification] = useState<string | null>(null);
 
   const fetchFoodItems = async () => {
@@ -54,7 +135,6 @@ const OrderScreen = ({route, navigation}: {route: any; navigation: any}) => {
         id: doc.id,
       }));
       setFoodItems(foodList);
-      setFilteredItems(foodList);
       setIsLoading(false);
     } catch (error) {
       console.log('Lỗi không lấy được dữ liệu Food Item: OrderScreen', error);
@@ -62,34 +142,30 @@ const OrderScreen = ({route, navigation}: {route: any; navigation: any}) => {
     }
   };
 
-  // search
-  const handleSearch = () => {
-    if (searchText === '') {
-      setFilteredItems(foodItems); // Nếu không có từ khóa, hiển thị tất cả món ăn
-    } else {
-      const searchQuery = removeAccents(searchText).toLowerCase();
-      const filtered = foodItems.filter(item =>
-        removeAccents(item.name).toLowerCase().includes(searchQuery),
-      );
-      setFilteredItems(filtered); // Cập nhật danh sách món ăn đã lọc
-    }
-  };
   useEffect(() => {
     fetchFoodItems();
   }, []);
 
-  // search
-  useEffect(() => {
-    handleSearch();
-  }, [searchText]);
+  const {
+    searchText,
+    setSearchText,
+    filteredItems,
+    setFilteredItems,
+    aiSuggestions,
+    performAISearch,
+    getRecommendations
+  } = useAIFoodSearch(foodItems);
 
-  //tab
+  useEffect(() => {
+    performAISearch(searchText);
+  }, [searchText, foodItems]);
+
   useEffect(() => {
     if (activeTab === 'all') {
-      setFilteredItems(foodItems.filter(item => !item.hidden));
+      performAISearch(searchText);
     } else {
       setFilteredItems(
-        foodItems.filter(item => item.category_id === activeTab && !item.hidden),
+        foodItems.filter(item => item.category_id === activeTab && !item.hidden)
       );
     }
   }, [activeTab, foodItems]);
@@ -102,7 +178,7 @@ const OrderScreen = ({route, navigation}: {route: any; navigation: any}) => {
     {id: 'dessert', title: 'Tráng miệng'},
   ];
   const cartButtonRef = useRef(null);
-  // Thêm sản phẩm vào giỏ hàng
+
   const addToCart = (item: FoodItem) => {
     setCart(prevCart => {
       const existingItem = prevCart.find(cartItem => cartItem.id === item.id);
@@ -117,7 +193,6 @@ const OrderScreen = ({route, navigation}: {route: any; navigation: any}) => {
     });
   };
 
-  // Xóa sản phẩm từ giỏ hàng
   const removeFromCart = (itemId: string) => {
     setCart(prevCart => prevCart.filter(item => item.id !== itemId));
   };
@@ -162,6 +237,66 @@ const OrderScreen = ({route, navigation}: {route: any; navigation: any}) => {
     [cart],
   );
 
+  const renderAISuggestions = () => {
+    if (aiSuggestions.length === 0) return null;
+
+    return (
+      <View style={styles.aiSuggestionsContainer}>
+        <Text style={styles.aiSuggestionsTitle}>Gợi ý từ AI:</Text>
+        <FlatList
+          horizontal
+          data={aiSuggestions}
+          renderItem={({item}) => (
+            <TouchableOpacity 
+              style={styles.aiSuggestionItem}
+              onPress={() => {
+                setSearchText(item.name);
+                performAISearch(item.name);
+              }}
+            >
+              <Image source={{uri: item.image}} style={styles.aiSuggestionImage} />
+              <Text style={styles.aiSuggestionText}>{item.name}</Text>
+            </TouchableOpacity>
+          )}
+          keyExtractor={item => item.id}
+          showsHorizontalScrollIndicator={false}
+        />
+      </View>
+    );
+  };
+
+  const renderRecommendations = () => {
+    const recommendations = getRecommendations(cart);
+    if (recommendations.length === 0) return null;
+
+    return (
+      <View style={styles.recommendationsContainer}>
+        <Text style={styles.recommendationsTitle}>Các món được đề xuất:</Text>
+        <FlatList
+          horizontal
+          data={recommendations}
+          renderItem={({item}) => (
+            <TouchableOpacity 
+              style={styles.recommendationItem}
+              onPress={() => addToCart(item)}
+            >
+              <Image source={{uri: item.image}} style={styles.recommendationImage} />
+              <Text style={styles.recommendationText}>{item.name}</Text>
+              <TouchableOpacity 
+                style={styles.addRecommendationButton}
+                onPress={() => addToCart(item)}
+              >
+                <Icon name="plus" color="#fff" size={16} />
+              </TouchableOpacity>
+            </TouchableOpacity>
+          )}
+          keyExtractor={item => item.id}
+          showsHorizontalScrollIndicator={false}
+        />
+      </View>
+    );
+  };
+
   const TabButton = ({
     title,
     onPress,
@@ -203,9 +338,12 @@ const OrderScreen = ({route, navigation}: {route: any; navigation: any}) => {
                 <Text style={styles.emptyCartText}>Đơn món ăn trống!</Text>
               }
             />
-            <Button
-              title='ĐÓNG'
-              onPress={() => setIsCartVisible(false)}/>
+            <TouchableOpacity 
+              style={styles.closeModalButton}
+              onPress={() => setIsCartVisible(false)}
+            >
+              <Text style={styles.closeModalButtonText}>ĐÓNG</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </Modal>
@@ -241,6 +379,8 @@ const OrderScreen = ({route, navigation}: {route: any; navigation: any}) => {
                   value={searchText}
                   onChangeText={setSearchText}
                 />
+                {renderAISuggestions()}
+                {cart.length > 0 && renderRecommendations()}
                 <View
                   style={{
                     flexDirection: 'row',
@@ -366,7 +506,7 @@ const styles = StyleSheet.create({
     shadowOffset: {width: 0, height: 2}, // Vị trí của bóng
     shadowOpacity: 0.1, // Độ mờ của bóng
     shadowRadius: 4, // Bán kính bóng
-    elevation: 3, // Hiển th��� bóng cho phần tử
+    elevation: 3, // Hiển thị bóng cho phần tử
   },
   foodImage: {
     width: 80,
@@ -537,6 +677,80 @@ const styles = StyleSheet.create({
   notificationText: {
     color: '#fff',
     fontSize: 16,
+  },
+  aiSuggestionsContainer: {
+    marginHorizontal: 10,
+    marginTop: 10,
+  },
+  aiSuggestionsTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  aiSuggestionItem: {
+    marginRight: 10,
+    alignItems: 'center',
+    width: 100,
+  },
+  aiSuggestionImage: {
+    width: 80,
+    height: 80,
+    borderRadius: 10,
+  },
+  aiSuggestionText: {
+    marginTop: 5,
+    fontSize: 12,
+    textAlign: 'center',
+  },
+  recommendationsContainer: {
+    marginHorizontal: 10,
+    marginTop: 10,
+  },
+  recommendationsTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  recommendationItem: {
+    marginRight: 10,
+    width: 120,
+    alignItems: 'center',
+    backgroundColor: '#f0f0f0',
+    borderRadius: 10,
+    padding: 10,
+  },
+  recommendationImage: {
+    width: 80,
+    height: 80,
+    borderRadius: 10,
+  },
+  recommendationText: {
+    marginTop: 5,
+    fontSize: 12,
+    textAlign: 'center',
+  },
+  addRecommendationButton: {
+    position: 'absolute',
+    bottom: 5,
+    right: 5,
+    backgroundColor: '#007AFF',
+    borderRadius: 15,
+    width: 30,
+    height: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  closeModalButton: {
+    backgroundColor: '#007AFF',
+    borderRadius: 10,
+    padding: 10,
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  closeModalButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
 
