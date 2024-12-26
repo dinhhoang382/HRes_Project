@@ -93,18 +93,42 @@ const useAIFoodSearch = (foodItems: FoodItem[]) => {
   const getRecommendations = (cart: CartItem[]) => {
     if (cart.length === 0) return [];
 
-    // Get categories and prices of items in cart
+    // Enhanced pattern analysis
     const cartCategories = [...new Set(cart.map(item => item.category_id))];
     const avgCartPrice = cart.reduce((sum, item) => sum + item.price, 0) / cart.length;
+    const timeOfDay = new Date().getHours();
 
     return foodItems.filter(item => {
+      // Category matching
       const categoryMatch = cartCategories.includes(item.category_id);
-      const priceMatch = 
-        item.price >= avgCartPrice * 0.8 && 
-        item.price <= avgCartPrice * 1.2;
       
-      return (categoryMatch || priceMatch) && !cart.some(cartItem => cartItem.id === item.id);
-    }).slice(0, 3); // Limit recommendations
+      // Price range matching
+      const priceMatch = item.price >= avgCartPrice * 0.8 && item.price <= avgCartPrice * 1.2;
+      
+      // Time-based recommendations
+      const isLunchTime = timeOfDay >= 11 && timeOfDay <= 14;
+      const isDinnerTime = timeOfDay >= 17 && timeOfDay <= 22;
+      const timeMatch = (isLunchTime && item.category_id === 'appetizer') || 
+                       (isDinnerTime && item.category_id === 'dessert');
+
+      // Complementary items logic
+      const hasMainCourse = cart.some(cartItem => 
+        ['oyster', 'shrimp'].includes(cartItem.category_id)
+      );
+      const complementaryMatch = hasMainCourse && item.category_id === 'drink';
+
+      // Combined scoring
+      const score = [
+        categoryMatch ? 2 : 0,
+        priceMatch ? 1 : 0,
+        timeMatch ? 1.5 : 0,
+        complementaryMatch ? 2 : 0
+      ].reduce((a, b) => a + b, 0);
+
+      return score >= 2 && !cart.some(cartItem => cartItem.id === item.id);
+    })
+    .sort((a, b) => b.price - a.price) // Sort by price descending
+    .slice(0, 3); // Top 3 recommendations
   };
 
   return {
@@ -174,6 +198,7 @@ const OrderScreen = ({route, navigation}: {route: any; navigation: any}) => {
     {id: 'all', title: 'Tất cả'},
     {id: 'drink', title: 'Đồ uống'},
     {id: 'oyster', title: 'Hàu'},
+    {id: 'shrimp', title: 'Tôm'}, 
     {id: 'appetizer', title: 'Khai vị'},
     {id: 'dessert', title: 'Tráng miệng'},
   ];

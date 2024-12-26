@@ -42,24 +42,6 @@ const App = () => {
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
-  const [isFirstLaunch, setIsFirstLaunch] = useState<boolean | null>(null);
-
-  useEffect(() => {
-    const checkFirstLaunch = async () => {
-      const firstLaunch = await AsyncStorage.getItem('hasLaunched');
-      if (firstLaunch === null) {
-        await AsyncStorage.setItem('hasLaunched', 'true');
-        setIsFirstLaunch(true);
-      } else {
-        setIsFirstLaunch(false);
-      }
-    };
-    checkFirstLaunch();
-  }, []);
-
-  if (isFirstLaunch === null) {
-    return null; // Optionally, a loading spinner can be shown here .
-  }
 
   return (
     <GestureHandlerRootView style={{flex: 1}}>
@@ -70,11 +52,7 @@ const App = () => {
           backgroundColor={backgroundStyle.backgroundColor}
         />
         <Stack.Navigator screenOptions={{headerShown: false}}>
-          {isFirstLaunch ? (
-            <Stack.Screen name="Splash" component={SplashScreen} />
-          ) : (
-            <Stack.Screen name="Login" component={Login} />
-          )}
+          <Stack.Screen name="Login" component={Login} />
           <Stack.Screen name="DrawerNavigation" component={DrawerNavigation} />
           <Stack.Screen name="TableDetail" component={TableDetail} />
           <Stack.Screen name="OrderScreen" component={OrderScreen} />
@@ -111,7 +89,7 @@ const App = () => {
             name="ManageTableScreen"
             component={ManageTableScreen}
           />
-          <Stack.Screen name='AllTableScreen' component={AllTables}/>
+          <Stack.Screen name="AllTableScreen" component={AllTables} />
         </Stack.Navigator>
       </NavigationContainer>
     </GestureHandlerRootView>
